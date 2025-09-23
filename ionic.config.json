@@ -1,0 +1,7 @@
+{
+  "name": "Havenly",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
