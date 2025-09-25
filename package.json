@@ -2,7 +2,7 @@
   "name": "havenly",
   "version": "0.0.1",
   "author": "vitoinacio",
-  "homepage": "https://havenly.com/",
+  "homepage": "https://github.com/vitoinacio/havenly",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -21,7 +21,6 @@
     "@angular/platform-browser": "^20.0.0",
     "@angular/platform-browser-dynamic": "^20.0.0",
     "@angular/router": "^20.0.0",
-    "@capacitor/android": "7.4.3",
     "@capacitor/app": "7.1.0",
     "@capacitor/core": "7.4.3",
     "@capacitor/haptics": "7.0.2",
@@ -61,5 +60,5 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.0"
   },
-  "description": "Havenly é uma plataforma completa para gestão de aluguéis, desenvolvida para atender proprietários que desejam controle total e profissional sobre seus imóveis, inquilinos e contratos. O sistema oferece uma interface intuitiva, recursos avançados e relatórios detalhados para facilitar a administração e tomada de decisão."
+  "description": "An Ionic project"
 }
