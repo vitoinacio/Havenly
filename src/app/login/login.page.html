@@ -6,7 +6,7 @@
 
   <div class="auth-form">
     <h2>Login</h2>
-    <form action="#" method="post">
+    <form (ngSubmit)="onLogin()">
       <ion-item>
         <ion-label position="floating">Email</ion-label>
         <ion-input
@@ -14,6 +14,8 @@
           inputmode="email"
           autocomplete="email"
           name="email"
+          [(ngModel)]="email"
+          required
         ></ion-input>
       </ion-item>
 
@@ -23,14 +25,13 @@
           type="password"
           autocomplete="current-password"
           name="password"
+          [(ngModel)]="password"
+          required
         ></ion-input>
       </ion-item>
 
       <ion-button expand="block" type="submit" class="mt-20">
-        <ion-spinner
-          name="lines-small"
-          style="margin-right: 8px; display: none"
-        ></ion-spinner>
+        <ion-spinner name="lines-small" style="margin-right: 8px; display: none"></ion-spinner>
         Entrar
       </ion-button>
     </form>
@@ -43,7 +44,8 @@
 
   <div class="auth-links">
     <p>
-      Esqueceu sua senha? <a [routerLink]="['/reset']">Recupere sua Senha</a>
+      Esqueceu sua senha?
+      <a [routerLink]="['/reset']">Recupere sua Senha</a>
     </p>
   </div>
 

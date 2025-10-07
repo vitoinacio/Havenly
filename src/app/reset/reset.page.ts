@@ -3,25 +3,39 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-reset',
   templateUrl: './reset.page.html',
   styleUrls: ['./reset.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, IonContent, IonItem, IonLabel, IonInput, IonButton]
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    IonContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonButton
+  ]
 })
 export class ResetPage {
   email: string = '';
 
-  constructor() {}
+  constructor(private authService: AuthService) {}
 
-  sendReset() {
-    console.log('Enviando email de recuperação para:', this.email);
-    // aqui você chamaria seu serviço de autenticação futuramente
+  async sendReset() {
+    try {
+      await this.authService.resetPassword(this.email);
+      alert('Email de recuperação enviado!');
+    } catch (err: any) {
+      alert('Erro ao enviar email: ' + err.message);
+    }
   }
 
   retry() {
-    console.log('Tentando novamente enviar email de recuperação...');
+    this.sendReset();
   }
 }
