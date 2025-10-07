@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-register',
@@ -17,8 +17,10 @@ import { IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angul
     IonItem,
     IonLabel,
     IonInput,
-    IonButton
-  ]
+    IonButton,
+    IonIcon,
+    IonSpinner
+]
 })
 export class RegisterPage {
   // propriedades ligadas ao formulário

@@ -1,21 +1,38 @@
-<ion-content class="ion-padding reset-container">
-  <div class="logo">
+<ion-content [fullscreen]="true" id="containerPage">
+  <div id="container" class="header">
     <h1>Havenly</h1>
-    <p>Gerencie seus imoveis de forma simplificada.</p>
+    <p>Gerencie seus imóveis de forma simplificada.</p>
   </div>
 
-  <form (ngSubmit)="sendReset()">
-    <ion-item class="input-field">
-      <ion-label position="floating">Email</ion-label>
-      <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
-    </ion-item>
+  <div class="auth-form">
+    <div class="auth-header">
+      <h2>Resetar senha</h2>
+      <p>Informe seu e-mail para receber um link de redefinição de senha.</p>
+    </div>
 
-    <ion-button expand="block" type="submit" class="btn-primary">
-      Enviar link de recuperação
-    </ion-button>
-  </form>
+    <form>
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          name="email"
+        ></ion-input>
+      </ion-item>
 
-  <div class="reset-link">
-    <a (click)="retry()">Não voltou até mim? Tentar novamente</a>
+      <ion-button expand="block" type="submit" class="mt-20">
+        <ion-spinner
+          name="lines-small"
+          style="margin-right: 8px; display: none"
+        ></ion-spinner>
+        Enviar link de recuperação
+      </ion-button>
+    </form>
+  </div>
+
+  <div class="auth-links">
+    <p>Não recebeu o email?</p>
+    <span fill="clear" routerLink="/login">Tentar novamente</span>
   </div>
 </ion-content>
