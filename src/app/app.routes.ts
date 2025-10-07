@@ -1,10 +1,20 @@
 import { Routes } from '@angular/router';
+import { HomePage } from './home/home.page';
+
+
+
 
 export const routes: Routes = [
   {
     path: 'home',
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
+   {
+    path: 'add-property',
+    loadComponent: () =>
+      import('./home/add-property/add-property.page').then(m => m.AddPropertyPage),
+  },
+
   {
     path: 'login',
     loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),

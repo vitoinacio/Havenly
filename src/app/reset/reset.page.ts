@@ -1,16 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import {
-  IonContent,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonButton,
-  IonIcon,
-  IonSpinner,
-} from '@ionic/angular/standalone';
+import { Router, RouterModule } from '@angular/router';
+import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner } from '@ionic/angular/standalone';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-reset',
@@ -26,21 +19,34 @@ import {
     IonLabel,
     IonInput,
     IonButton,
-    IonIcon,
     IonSpinner,
-  ],
+  ]
 })
 export class ResetPage {
   email: string = '';
 
-  constructor() {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  sendReset() {
-    console.log('Enviando email de recuperação para:', this.email);
-    // aqui você chamaria seu serviço de autenticação futuramente
+  async onReset() {
+    if (!this.email) {
+      alert('Informe seu email!');
+      return;
+    }
+
+    try {
+      await this.authService.resetPassword(this.email);
+      alert('Email de recuperação enviado!');
+      this.router.navigate(['/login']);
+    } catch (err: any) {
+      console.error(err);
+      alert('Erro ao enviar email: ' + err.message);
+    }
   }
 
-  retry() {
-    console.log('Tentando novamente enviar email de recuperação...');
+  goToLogin() {
+    this.router.navigate(['/login']);
   }
 }

@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner, IonIcon } from '@ionic/angular/standalone';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -18,38 +19,44 @@ import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSpinner
     IonLabel,
     IonInput,
     IonButton,
-    IonIcon,
-    IonSpinner
-]
+    IonSpinner,
+    IonIcon
+  ]
 })
 export class RegisterPage {
-  // propriedades ligadas ao formulário
   full_name: string = '';
   email: string = '';
   password: string = '';
   confirm: string = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  // chamado no (ngSubmit)
-  onRegister() {
-    if (this.password !== this.confirm) {
-      console.log('As senhas não coincidem!');
+  async onRegister() {
+    if (!this.full_name || !this.email || !this.password || !this.confirm) {
+      alert('Preencha todos os campos!');
       return;
     }
 
-    console.log('Registrando usuário:', {
-      full_name: this.full_name,
-      email: this.email,
-      password: this.password
-    });
+    if (this.password !== this.confirm) {
+      alert('As senhas não coincidem!');
+      return;
+    }
 
-    // aqui você chamaria seu serviço de autenticação futuramente
-    // por enquanto só redireciona para login
-    this.router.navigate(['/login']);
+    try {
+      // ✅ Cria usuário no Firebase
+      await this.authService.register(this.email, this.password);
+
+      alert('Usuário registrado com sucesso!');
+      this.router.navigate(['/login']);
+    } catch (err: any) {
+      console.error(err);
+      alert('Erro ao registrar: ' + err.message);
+    }
   }
 
-  // chamado no link "Já tem conta? Fazer Login"
   goToLogin() {
     this.router.navigate(['/login']);
   }
