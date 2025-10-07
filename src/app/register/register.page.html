@@ -1,34 +1,98 @@
-<ion-content class="ion-padding register-container">
-  <div class="logo">
+<ion-content [fullscreen]="true" id="containerPage">
+  <div id="container" class="header">
     <h1>Havenly</h1>
-    <p>Gerencie seus imoveis de forma simplificada.</p>
+    <p>Gerencie seus imóveis de forma simplificada.</p>
   </div>
 
-  <form (ngSubmit)="onRegister()">
-    <ion-item class="input-field">
-      <ion-label position="floating">Nome Completo</ion-label>
-      <ion-input [(ngModel)]="full_name" name="full_name" required></ion-input>
-    </ion-item>
+  <div class="auth-form">
+    <h2>Criar Conta</h2>
+    <form (ngSubmit)="onRegister()">
+      <ion-item>
+        <ion-label position="floating">Nome</ion-label>
+        <ion-input
+          type="text"
+          inputmode="text"
+          autocomplete="name"
+          name="full_name"
+          [(ngModel)]="full_name"
+        ></ion-input>
+      </ion-item>
 
-    <ion-item class="input-field">
-      <ion-label position="floating">Email</ion-label>
-      <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          name="email"
+          [(ngModel)]="email"
+        ></ion-input>
+      </ion-item>
 
-    <ion-item class="input-field">
-      <ion-label position="floating">Senha</ion-label>
-      <ion-input [(ngModel)]="password" name="password" type="password" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="floating">Senha</ion-label>
+        <ion-input
+          type="password"
+          inputmode="text"
+          autocomplete="new-password"
+          name="password"
+          [(ngModel)]="password"
+        ></ion-input>
+      </ion-item>
 
-    <ion-item class="input-field">
-      <ion-label position="floating">Confirme a senha</ion-label>
-      <ion-input [(ngModel)]="confirm" name="confirm" type="password" required></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-label position="floating">Confirmar Senha</ion-label>
+        <ion-input
+          type="password"
+          autocomplete="new-password"
+          name="confirm"
+          [(ngModel)]="confirm"
+        ></ion-input>
+      </ion-item>
 
-    <ion-button expand="block" type="submit" class="btn-primary">Criar Conta</ion-button>
-  </form>
+      <ion-button expand="block" type="submit" class="mt-20">
+        <ion-spinner
+          name="lines-small"
+          style="margin-right: 8px; display: none"
+        ></ion-spinner>
+        Criar Conta
+      </ion-button>
+    </form>
+  </div>
 
-  <div class="reset-link">
-    <a (click)="goToLogin()">Já tem conta? Fazer Login</a>
+  <div class="auth-links">
+    <p>Já tem conta?</p>
+    <span fill="clear" routerLink="/login">Fazer Login</span>
+  </div>
+
+  <div class="divider"><span></span> ou <span></span></div>
+
+  <div class="social">
+    <!-- Google: fundo branco, G multicolorido -->
+    <ion-button id="btnGoogle" aria-label="Entrar com Google" >
+      <!-- SVG oficial multicolor do "G" (simplificado) -->
+      <svg class="g-icon" viewBox="0 0 48 48" aria-hidden="true">
+        <path
+          fill="#EA4335"
+          d="M24 9.5c3.3 0 6.3 1.2 8.6 3.3l6.4-6.4C34.9 2.7 29.8 1 24 1 14.6 1 6.5 6.5 2.7 14.2l7.9 6.1C12.5 14.7 17.8 9.5 24 9.5z"
+        />
+        <path
+          fill="#4285F4"
+          d="M46.5 24c0-1.6-.2-3.2-.6-4.7H24v9h12.7c-.6 3.1-2.5 5.7-5.3 7.4l8.2 6.3c4.8-4.4 6.9-10.9 6.9-18z"
+        />
+        <path
+          fill="#34A853"
+          d="M10.6 27.6c-.6-1.9-.6-4 0-5.9l-7.9-6.1C.9 17.8 0 20.8 0 24c0 3.2.9 6.2 2.7 8.4l7.9-6.1z"
+        />
+        <path
+          fill="#FBBC05"
+          d="M24 47c6.5 0 12-2.1 16-5.7l-8.2-6.3c-2.2 1.4-4.9 2.2-7.8 2.2-6.2 0-11.5-5.2-12.5-12.4l-7.9 6.1C6.5 41.5 14.6 47 24 47z"
+        />
+      </svg>
+    </ion-button>
+
+    <ion-button id="btnFacebook" aria-label="Entrar com Facebook" >
+      <ion-icon name="logo-facebook" class="facebook-icon"></ion-icon>
+    </ion-button>
   </div>
 </ion-content>
