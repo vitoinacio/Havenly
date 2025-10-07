@@ -1,0 +1,44 @@
+.register-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+
+  .logo {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #1e3a8a;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #6b7280;
+    }
+  }
+
+  .input-field {
+    margin-bottom: 1rem;
+  }
+
+  .btn-primary {
+    --background: #2563eb;
+    --border-radius: 8px;
+    margin-top: 1rem;
+  }
+
+  .reset-link {
+    text-align: center;
+    margin-top: 1rem;
+
+    a {
+      font-size: 0.9rem;
+      color: #2563eb;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+}

@@ -1,0 +1,34 @@
+<ion-content class="ion-padding register-container">
+  <div class="logo">
+    <h1>Havenly</h1>
+    <p>Gerencie seus imoveis de forma simplificada.</p>
+  </div>
+
+  <form (ngSubmit)="onRegister()">
+    <ion-item class="input-field">
+      <ion-label position="floating">Nome Completo</ion-label>
+      <ion-input [(ngModel)]="full_name" name="full_name" required></ion-input>
+    </ion-item>
+
+    <ion-item class="input-field">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
+    </ion-item>
+
+    <ion-item class="input-field">
+      <ion-label position="floating">Senha</ion-label>
+      <ion-input [(ngModel)]="password" name="password" type="password" required></ion-input>
+    </ion-item>
+
+    <ion-item class="input-field">
+      <ion-label position="floating">Confirme a senha</ion-label>
+      <ion-input [(ngModel)]="confirm" name="confirm" type="password" required></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="btn-primary">Criar Conta</ion-button>
+  </form>
+
+  <div class="reset-link">
+    <a (click)="goToLogin()">Já tem conta? Fazer Login</a>
+  </div>
+</ion-content>

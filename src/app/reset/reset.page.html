@@ -1,0 +1,21 @@
+<ion-content class="ion-padding reset-container">
+  <div class="logo">
+    <h1>Havenly</h1>
+    <p>Gerencie seus imoveis de forma simplificada.</p>
+  </div>
+
+  <form (ngSubmit)="sendReset()">
+    <ion-item class="input-field">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="btn-primary">
+      Enviar link de recuperação
+    </ion-button>
+  </form>
+
+  <div class="reset-link">
+    <a (click)="retry()">Não voltou até mim? Tentar novamente</a>
+  </div>
+</ion-content>
