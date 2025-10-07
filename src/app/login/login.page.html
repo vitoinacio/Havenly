@@ -39,7 +39,7 @@
 
   <div class="auth-links">
     <p>Ainda não tem conta?</p>
-    <ion-button fill="clear" routerLink="/register">Criar Conta</ion-button>
+    <ion-button fill="clear" [routerLink]="['/register']">Criar Conta</ion-button>
   </div>
 
   <div class="auth-links">
@@ -52,9 +52,8 @@
   <div class="divider"><span></span> ou <span></span></div>
 
   <div class="social">
-    <!-- Google: fundo branco, G multicolorido -->
+
     <ion-button id="btnGoogle" aria-label="Entrar com Google">
-      <!-- SVG oficial multicolor do "G" (simplificado) -->
       <svg class="g-icon" viewBox="0 0 48 48" aria-hidden="true">
         <path
           fill="#EA4335"
@@ -75,8 +74,8 @@
       </svg>
     </ion-button>
 
-    <ion-button id="btnApple" aria-label="Entrar com Apple">
-      <ion-icon name="logo-apple" class="apple-icon"></ion-icon>
+    <ion-button id="btnFacebook" aria-label="Entrar com Facebook">
+      <ion-icon name="logo-facebook" class="facebook-icon"></ion-icon>
     </ion-button>
   </div>
 </ion-content>

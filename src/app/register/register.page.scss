@@ -1,44 +1,193 @@
-.register-container {
+/* GLOBAL RESET */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* CONTAINER */
+#containerPage {
+  --padding-start: 25px;
+  --padding-end: 25px;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  padding-left: var(--padding-start);
+  padding-right: var(--padding-end);
+  padding-top: var(--padding-top);
+  padding-bottom: var(--padding-bottom);
+}
+
+/* HEADER */
+.header {
+  margin: 50px 0;
+}
+
+.header p {
+  color: var(--ion-color-medium);
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* AUTH FORM */
+.auth-form form {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+
+.auth-form ion-item {
+  --background: var(--ion-color-light);
+  --border-radius: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 44px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.auth-form ion-item ion-label {
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
+
+.auth-form ion-item ion-input {
+  font-size: 0.9rem;
+}
+
+.auth-form ion-button {
+  --background: var(--ion-color-primary);
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --padding-end: 15px;
+  --padding-top: 22px;
+  --padding-bottom: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #fff;
+  width: 100%;
+}
+
+/* AUTH LINKS */
+.auth-links {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--ion-color-medium);
+  display: flex;
   justify-content: center;
-  height: 100%;
+  align-items: center;
+  gap: 8px;
+}
 
-  .logo {
-    text-align: center;
-    margin-bottom: 2rem;
+.auth-links span {
+  color: var(--ion-color-primary);
+  cursor: pointer;
+}
 
-    h1 {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #1e3a8a;
-    }
+/* DIVIDER */
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 30px 0 20px 0;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
 
-    p {
-      font-size: 0.95rem;
-      color: #6b7280;
-    }
+.divider span {
+  flex: 1;
+  height: 1px;
+  background: var(--ion-color-medium);
+}
+
+.divider span:first-child {
+  margin-right: 10px;
+}
+
+.divider span:last-child {
+  margin-left: 10px;
+}
+
+/* SOCIAL LOGIN */
+.social {
+  display: flex;
+  gap: 20%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#btnGoogle,
+#btnFacebook {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --border-radius: 50%;
+  --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  border: none;
+}
+
+#btnGoogle::part(native),
+#btnFacebook::part(native) {
+  width: 70px;
+  height: 70px;
+  max-width: 100%;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  background: rgba(160, 160, 160, 0.226);
+}
+
+#btnGoogle .g-icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+
+#btnFacebook .facebook-icon {
+  font-size: 30px;
+  color: var(--ion-color-primary);
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 480px) {
+  .header {
+    margin: 30px 0;
   }
 
-  .input-field {
-    margin-bottom: 1rem;
+  .header p {
+    font-size: 0.8rem;
   }
 
-  .btn-primary {
-    --background: #2563eb;
-    --border-radius: 8px;
-    margin-top: 1rem;
+  .auth-form form {
+    gap: 12px;
   }
 
-  .reset-link {
-    text-align: center;
-    margin-top: 1rem;
+  .auth-form ion-button,
+  .auth-links ion-button {
+    --padding-top: 16px;
+    --padding-bottom: 16px;
+    font-size: 0.85rem;
+  }
 
-    a {
-      font-size: 0.9rem;
-      color: #2563eb;
-      text-decoration: underline;
-      cursor: pointer;
-    }
+  .divider {
+    font-size: 0.8rem;
+    margin: 20px 0;
+  }
+
+  #btnGoogle::part(native),
+  #btnFacebook::part(native) {
+    width: 60px;
+    height: 60px;
+  }
+
+  .social {
+    gap: 10%;
   }
 }
