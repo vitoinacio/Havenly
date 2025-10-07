@@ -5,16 +5,24 @@
   </div>
 
   <div class="auth-form">
-    <h2>Login</h2>
-    <form (ngSubmit)="onLogin()">
+    <h2>Criar conta</h2>
+    <form>
+      <ion-item>
+        <ion-label position="floating">Nome</ion-label>
+        <ion-input
+          type="text"
+          inputmode="text"
+          autocomplete="name"
+          name="name"
+        ></ion-input>
+      </ion-item>
+
       <ion-item>
         <ion-label position="floating">Email</ion-label>
         <ion-input
           type="email"
-          inputmode="email"
           autocomplete="email"
           name="email"
-          [(ngModel)]="email" required
         ></ion-input>
       </ion-item>
 
@@ -24,7 +32,15 @@
           type="password"
           autocomplete="current-password"
           name="password"
-          [(ngModel)]="password" required
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Confirmar Senha</ion-label>
+        <ion-input
+          type="password"
+          autocomplete="current-password"
+          name="confirmPassword"
         ></ion-input>
       </ion-item>
 
@@ -33,26 +49,19 @@
           name="lines-small"
           style="margin-right: 8px; display: none"
         ></ion-spinner>
-        Entrar
+        Criar Conta
       </ion-button>
     </form>
   </div>
 
   <div class="auth-links">
-    <p>Ainda não tem conta?</p>
-    <ion-button fill="clear" [routerLink]="['/register']">Criar Conta</ion-button>
-  </div>
-
-  <div class="auth-links">
-    <p>
-      Esqueceu sua senha? <a [routerLink]="['/reset-password']">Recupere sua Senha</a>
-    </p>
+    <p>Ja tem conta?</p>
+    <span [routerLink]="['/login']">Fazer login</span>
   </div>
 
   <div class="divider"><span></span> ou <span></span></div>
 
   <div class="social">
-
     <ion-button id="btnGoogle" aria-label="Entrar com Google">
       <svg class="g-icon" viewBox="0 0 48 48" aria-hidden="true">
         <path
@@ -79,3 +88,4 @@
     </ion-button>
   </div>
 </ion-content>
+

@@ -3,7 +3,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -77,22 +78,15 @@ html, body {
   margin-top: 20px;
   text-align: center;
   color: var(--ion-color-medium);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
-.auth-links ion-button {
-  --background: white;
-  --color: var(--ion-color-primary);
-  --border-radius: 12px;
-  --padding-start: 16px;
-  --padding-end: 15px;
-  --padding-top: 22px;
-  --padding-bottom: 20px;
-  --background-hover: var(--ion-color-dark);
-  --background-activated: #88f4be;
-  --background-focused: #88f4be;
-  font-weight: bold;
-  width: 100%;
-  text-transform: uppercase;
+.auth-links span {
+  color: var(--ion-color-primary);
+  cursor: pointer;
 }
 
 /* DIVIDER */
@@ -134,7 +128,7 @@ html, body {
   --padding-top: 0;
   --padding-bottom: 0;
   --border-radius: 50%;
-  --box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   border: none;
 }
 
