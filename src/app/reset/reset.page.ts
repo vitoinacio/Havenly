@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
 import { AuthService } from '../services/auth.service';
 
@@ -24,18 +24,28 @@ import { AuthService } from '../services/auth.service';
 export class ResetPage {
   email: string = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  async sendReset() {
+  async onReset() {
+    if (!this.email) {
+      alert('Informe seu email!');
+      return;
+    }
+
     try {
       await this.authService.resetPassword(this.email);
       alert('Email de recuperação enviado!');
+      this.router.navigate(['/login']);
     } catch (err: any) {
+      console.error(err);
       alert('Erro ao enviar email: ' + err.message);
     }
   }
 
-  retry() {
-    this.sendReset();
+  goToLogin() {
+    this.router.navigate(['/login']);
   }
 }
