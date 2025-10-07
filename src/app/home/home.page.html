@@ -1,20 +1,58 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Havenly
-    </ion-title>
+    <ion-title>Havenly</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterProperties()"
+                   placeholder="Buscar por endereço ou inquilino"></ion-searchbar>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="selectedFilter" (ionChange)="filterProperties()">
+      <ion-segment-button value="todos">Todos</ion-segment-button>
+      <ion-segment-button value="alugados">Alugados</ion-segment-button>
+      <ion-segment-button value="vazios">Vazios</ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Havenly</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let property of filteredProperties">
+      <ion-thumbnail slot="start">
+        <img [src]="property.photo" />
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ property.name }}</h2>
+        <p *ngIf="property.tenant">👤 {{ property.tenant }}</p>
+        <p>💰 R$ {{ property.rent }}</p>
+        <p>📅 Vencimento: {{ property.dueDate | date:'dd/MM/yyyy' }}</p>
+        <p>
+          🔘 <span [ngStyle]="{'color': property.status === 'Alugado' ? 'green' : 'red'}">
+            {{ property.status }}
+          </span>
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="toggleFabActions()">
+    <ion-icon [name]="showFabActions ? 'close' : 'add'"></ion-icon>
+  </ion-fab-button>
 
-  <div id="container">
-    <strong>Havenly</strong>
-    <p>Gerencie seus imóveis de forma simplificada.</p>
-  </div>
+  <ion-fab-list side="top">
+    <ion-fab-button color="success" (click)="createProperty()">
+      <ion-icon name="add-circle-outline"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button color="danger" (click)="deleteProperty()">
+      <ion-icon name="trash-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab-list>
+</ion-fab>
+
+
 </ion-content>
