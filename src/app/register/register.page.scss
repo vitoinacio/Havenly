@@ -59,22 +59,14 @@
   margin-top: 20px;
   text-align: center;
   color: var(--ion-color-medium);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 
-  ion-button {
-    --background: white;
-    --color: var(--ion-color-primary);
-    --border-radius: 8px;
-    --padding-start: 16px;
-    --padding-end: 15px;
-    --padding-top: 22px;
-    --padding-bottom: 20px;
-    --border-radius: 12px;
-    --background-hover: var(--ion-color-dark);
-    --background-activated: #88f4be;
-    --background-focused: #88f4be;
-    font-weight: bold;
-    width: 100%;
-    text-transform: uppercase;
+  span {
+    cursor: pointer;
+    color: var(--ion-color-primary);
   }
 }
 
@@ -115,7 +107,7 @@
   --padding-top: 0;
   --padding-bottom: 0;
   --border-radius: 50%;
-  --box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   border: none; /* extra */
 }
 
@@ -138,6 +130,5 @@
 
 #btnFacebook .facebook-icon {
   font-size: 30px;
-  color: var(--ion-color-primary); 
+  color: var(--ion-color-primary);
 }
-

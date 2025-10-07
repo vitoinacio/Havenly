@@ -5,8 +5,19 @@
   </div>
 
   <div class="auth-form">
-    <h2>Login</h2>
-    <form action="#" method="post">
+    <h2>Criar Conta</h2>
+    <form (ngSubmit)="onRegister()">
+      <ion-item>
+        <ion-label position="floating">Nome</ion-label>
+        <ion-input
+          type="text"
+          inputmode="text"
+          autocomplete="name"
+          name="full_name"
+          [(ngModel)]="full_name"
+        ></ion-input>
+      </ion-item>
+
       <ion-item>
         <ion-label position="floating">Email</ion-label>
         <ion-input
@@ -14,6 +25,7 @@
           inputmode="email"
           autocomplete="email"
           name="email"
+          [(ngModel)]="email"
         ></ion-input>
       </ion-item>
 
@@ -21,8 +33,20 @@
         <ion-label position="floating">Senha</ion-label>
         <ion-input
           type="password"
-          autocomplete="current-password"
+          inputmode="text"
+          autocomplete="new-password"
           name="password"
+          [(ngModel)]="password"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Confirmar Senha</ion-label>
+        <ion-input
+          type="password"
+          autocomplete="new-password"
+          name="confirm"
+          [(ngModel)]="confirm"
         ></ion-input>
       </ion-item>
 
@@ -31,27 +55,21 @@
           name="lines-small"
           style="margin-right: 8px; display: none"
         ></ion-spinner>
-        Entrar
+        Criar Conta
       </ion-button>
     </form>
   </div>
 
   <div class="auth-links">
-    <p>Ainda não tem conta?</p>
-    <ion-button fill="clear" routerLink="/register">Criar Conta</ion-button>
-  </div>
-
-  <div class="auth-links">
-    <p>
-      Esqueceu sua senha? <a [routerLink]="['/reset']">Recupere sua Senha</a>
-    </p>
+    <p>Já tem conta?</p>
+    <span fill="clear" routerLink="/login">Fazer Login</span>
   </div>
 
   <div class="divider"><span></span> ou <span></span></div>
 
   <div class="social">
     <!-- Google: fundo branco, G multicolorido -->
-    <ion-button id="btnGoogle" aria-label="Entrar com Google">
+    <ion-button id="btnGoogle" aria-label="Entrar com Google" >
       <!-- SVG oficial multicolor do "G" (simplificado) -->
       <svg class="g-icon" viewBox="0 0 48 48" aria-hidden="true">
         <path
@@ -73,7 +91,7 @@
       </svg>
     </ion-button>
 
-    <ion-button id="btnFacebook" aria-label="Entrar com Facebook">
+    <ion-button id="btnFacebook" aria-label="Entrar com Facebook" >
       <ion-icon name="logo-facebook" class="facebook-icon"></ion-icon>
     </ion-button>
   </div>

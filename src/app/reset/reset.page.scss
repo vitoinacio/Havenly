@@ -1,0 +1,82 @@
+#containerPage {
+  --padding-start: 25px;
+  --padding-end: 25px;
+
+  --padding-top: 0;
+  --padding-bottom: 0;
+}
+
+.header {
+  margin: 50px 0;
+
+  p {
+    color: var(--ion-color-medium);
+    margin-top: 8px;
+    font-size: 0.9rem;
+  }
+}
+
+.auth-form {
+
+  .auth-header {
+    margin-bottom: 20px;
+
+    p {
+      color: var(--ion-color-medium);
+      font-size: 0.9rem;
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  ion-item {
+    --background: var(--ion-color-light);
+    --border-radius: 8px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --min-height: 44px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    ion-label {
+      color: var(--ion-color-medium);
+      font-size: 0.9rem;
+    }
+
+    ion-input {
+      font-size: 0.9rem;
+    }
+  }
+
+  ion-button {
+    --background: var(--ion-color-primary);
+    --border-radius: 8px;
+    --padding-start: 16px;
+    --padding-end: 15px;
+    --padding-top: 22px;
+    --padding-bottom: 20px;
+    --border-radius: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+  }
+}
+
+.auth-links {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--ion-color-medium);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  span {
+    cursor: pointer;
+    color: var(--ion-color-primary);
+  }
+}
+

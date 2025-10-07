@@ -14,4 +14,6 @@ export const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
+  { path: 'register', loadComponent: () => import('./register/register.page').then(m => m.RegisterPage) },
+  { path: 'reset', loadComponent: () => import('./reset/reset.page').then(m => m.ResetPage) },
 ];
