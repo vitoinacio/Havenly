@@ -29,17 +29,9 @@ export class AddPropertyPage {
     private toastCtrl: ToastController
   ) {}
 
-  async onFileSelected(event: any) {
-    this.photoFile = event.target.files[0];
-  }
 
-  async uploadPhoto(): Promise<string> {
-    if (!this.photoFile) return '';
-    const filePath = `properties/${Date.now()}_${this.photoFile.name}`;
-    const storageRef = ref(this.storage, filePath);
-    const snapshot = await uploadBytes(storageRef, this.photoFile);
-    return await getDownloadURL(snapshot.ref);
-  }
+
+ 
 
   async saveProperty() {
     if (!this.name || !this.rent || !this.dueDate) {
@@ -50,10 +42,9 @@ export class AddPropertyPage {
     this.isUploading = true;
 
     try {
-      const photoUrl = await this.uploadPhoto();
+      
 
       const property = {
-        photo: photoUrl || 'assets/img/default.jpg',
         name: this.name,
         tenant: this.tenant,
         rent: this.rent,
