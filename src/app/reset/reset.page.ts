@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -18,8 +18,7 @@ import { AuthService } from '../services/auth.service';
     IonItem,
     IonLabel,
     IonInput,
-    IonButton,
-    IonSpinner,
+    IonButton
   ]
 })
 export class ResetPage {
