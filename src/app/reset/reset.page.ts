@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
 import { AuthService } from '../services/auth.service';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-reset',
@@ -18,7 +19,8 @@ import { AuthService } from '../services/auth.service';
     IonItem,
     IonLabel,
     IonInput,
-    IonButton
+    IonButton,
+    IonicModule,
   ]
 })
 export class ResetPage {
