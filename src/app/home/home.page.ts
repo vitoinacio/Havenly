@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { Property } from '../services/property.model';
 import { FormsModule } from '@angular/forms';
+import { Chart } from 'chart.js';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +20,7 @@ export class HomePage implements OnInit {
   searchTerm: string = '';
   selectedFilter: string = 'todos';
   showFabActions: boolean = false;
+  chart: any;  // Declarar a variável 'chart'
 
   constructor(private firestore: Firestore, private modalCtrl: ModalController) {}
 
@@ -28,6 +30,30 @@ export class HomePage implements OnInit {
       this.properties = data;
       this.filterProperties();
     });
+
+    setTimeout(() => {
+      const ctx = document.getElementById('myChart') as HTMLCanvasElement;
+      if (ctx) {
+        this.chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: [{
+              label: '# of Votes',
+              data: [12, 19, 3, 5, 2, 3],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+    }, 100);
   }
 
   filterProperties() {
@@ -44,8 +70,6 @@ export class HomePage implements OnInit {
     });
   }
 
-
-
   toggleFabActions() {
     this.showFabActions = !this.showFabActions;
   }
@@ -60,4 +84,3 @@ export class HomePage implements OnInit {
     alert('Função de exclusão ainda será implementada.');
   }
 }
-

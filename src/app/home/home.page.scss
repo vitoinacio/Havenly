@@ -1,23 +1,6 @@
-<<<<<<< HEAD
-ion-thumbnail img {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-
-ion-label h2 {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-ion-label p {
-  margin: 2px 0;
-}
-=======
 #containerPage {
   --padding-start: 25px;
   --padding-end: 25px;
-
   --padding-top: 0;
   --padding-bottom: 0;
   
@@ -26,16 +9,28 @@ ion-label p {
     align-items: center;
     justify-content: space-between;
     margin-top: 20px;
-  
-    .header-img {
+
       .user-image {
         width: 40px;
         height: 40px;
         border-radius: 100%;
         object-fit: cover;
       }
+  }
+
+  .dashboard {
+    width: 100%;
+
+    chart {
+      width: 100%;
+      height: 200px;
+      margin-top: 20px;
+
+      myChart {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }
 
->>>>>>> main
