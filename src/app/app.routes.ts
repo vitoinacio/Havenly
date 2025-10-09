@@ -26,4 +26,8 @@ export const routes: Routes = [
   },
   { path: 'register', loadComponent: () => import('./register/register.page').then(m => m.RegisterPage) },
   { path: 'reset', loadComponent: () => import('./reset/reset.page').then(m => m.ResetPage) },
+  {
+    path: 'properties',
+    loadComponent: () => import('./properties/properties.page').then( m => m.PropertiesPage)
+  },
 ];
