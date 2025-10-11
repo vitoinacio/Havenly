@@ -1,11 +1,46 @@
 <ion-content id="containerPage">
   <div class="header">
-      <h1>Havenly</h1>
-      <img class="user-image" src="../../assets/user.png" alt="User Image" />
+    <h1>Havenly</h1>
+    <img class="user-image" src="../../assets/user.png" alt="User Image" />
   </div>
-  <div class="dashboard">
-    <div class="chart">
-      <canvas id="myChart"></canvas>
+
+  <section class="summary-card">
+    <div class="card-inner">
+      <div class="card-title">Sumário</div>
+
+      <div class="content">
+        <div class="chart-wrap">
+          <canvas #barChart></canvas>
+        </div>
+
+        <div class="metrics">
+          <div class="line">
+            <span class="label">Total de Imóveis</span>
+            <span class="value total">{{ totalImoveis }}</span>
+          </div>
+
+          <div class="group">
+            <div class="row">
+              <span class="dot dot-green"></span>
+              <span class="label">Alugados</span>
+              <span class="value green">{{ alugados }}</span>
+            </div>
+            <div class="row">
+              <span class="dot dot-red"></span>
+              <span class="label">Vazios</span>
+              <span class="value red">{{ vazios }}</span>
+            </div>
+            <div class="row">
+              <span class="dot dot-blue"></span>
+              <span class="label">Pagos</span>
+              <span class="value blue">{{ pagos }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <span>Receita Total: <strong>{{ receitaTotal}}</strong></span>
+      </div>
     </div>
-  </div>
+  </section>
 </ion-content>

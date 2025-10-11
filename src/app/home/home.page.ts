@@ -1,11 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
-import { Firestore, collection, collectionData } from '@angular/fire/firestore';
-import { Property } from '../services/property.model';
 import { FormsModule } from '@angular/forms';
-import { Chart } from 'chart.js';
+import Chart, { ChartConfiguration } from 'chart.js/auto';
 
 @Component({
   selector: 'app-home',
@@ -14,81 +18,80 @@ import { Chart } from 'chart.js';
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
-export class HomePage implements OnInit {
-  properties: Property[] = [];
-  filteredProperties: Property[] = [];
-  searchTerm: string = '';
-  selectedFilter: string = 'todos';
-  showFabActions: boolean = false;
-  chart: any;
+export class HomePage implements AfterViewInit, OnDestroy {
+  @ViewChild('barChart') barChart!: ElementRef<HTMLCanvasElement>;
+  chart?: Chart;
 
-  constructor(
-    private firestore: Firestore,
-    private modalCtrl: ModalController
-  ) {}
+  alugados = 2;
+  vazios = 2;
+  pagos = 2;
+  receitaTotal = 1000;
+  get totalImoveis() {
+    return this.alugados + this.vazios + this.pagos;
+  }
 
-  ngOnInit() {
-    setTimeout(() => {
-      const ctx = document.getElementById('myChart') as HTMLCanvasElement;
-      if (ctx) {
-        this.chart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [
-              {
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                borderWidth: 1,
-              },
-            ],
+  ngAfterViewInit() {
+    const canvas = this.barChart.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const gradBlue = ctx.createLinearGradient(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+    gradBlue.addColorStop(0, '#1a2a8a');
+    gradBlue.addColorStop(1, '#000456');
+
+    const gradGreen = ctx.createLinearGradient(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+    gradGreen.addColorStop(0, '#1e9a1a');
+    gradGreen.addColorStop(1, '#085100');
+
+    const gradRed = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradRed.addColorStop(0, '#c23a3a');
+    gradRed.addColorStop(1, '#650101');
+
+    const dataValues = [this.pagos, this.alugados, this.vazios];
+
+    const config: ChartConfiguration<'doughnut'> = {
+      type: 'doughnut',
+      data: {
+        labels: ['Pagos', 'Alugados', 'Vazios'],
+        datasets: [
+          {
+            data: dataValues,
+            backgroundColor: [gradBlue, gradGreen, gradRed],
+            borderWidth: 0,
+            hoverOffset: 0,
+            spacing: 1,
+            borderRadius: 2,
           },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
-          },
-        });
-      }
-    }, 100);
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 600 },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false },
+        },
+        cutout: '70%', 
+        rotation: -0.5 * Math.PI,
+        circumference: 360,
+      },
+    };
 
-    const propertiesRef = collection(this.firestore, 'properties');
-    collectionData(propertiesRef, { idField: 'id' }).subscribe((data: any) => {
-      this.properties = data;
-      this.filterProperties();
-    });
+    this.chart = new Chart(ctx, config);
   }
 
-  filterProperties() {
-    this.filteredProperties = this.properties.filter((property) => {
-      const matchesSearch =
-        property.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        (property.tenant &&
-          property.tenant
-            .toLowerCase()
-            .includes(this.searchTerm.toLowerCase()));
-
-      const matchesFilter =
-        this.selectedFilter === 'todos' ||
-        property.status.toLowerCase() === this.selectedFilter;
-
-      return matchesSearch && matchesFilter;
-    });
-  }
-
-  toggleFabActions() {
-    this.showFabActions = !this.showFabActions;
-  }
-
-  createProperty() {
-    // Navega para a página de criação
-    window.location.href = '/add-property';
-  }
-
-  deleteProperty() {
-    // Aqui você pode abrir um modal para selecionar e excluir
-    alert('Função de exclusão ainda será implementada.');
+  ngOnDestroy() {
+    this.chart?.destroy();
   }
 }
