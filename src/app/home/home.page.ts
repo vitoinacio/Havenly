@@ -5,8 +5,11 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
+import {
+  IonContent,
+  IonButton,
+} from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
@@ -14,7 +17,13 @@ import Chart, { ChartConfiguration } from 'chart.js/auto';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule, FormsModule],
+  imports: [
+    IonButton,
+    IonContent,
+    CommonModule,
+    RouterModule,
+    FormsModule,
+  ],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
@@ -24,7 +33,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
 
   alugados = 2;
   vazios = 2;
-  pagos = 2;
+  pagos = 6;
   receitaTotal = 1000;
   get totalImoveis() {
     return this.alugados + this.vazios + this.pagos;
@@ -41,8 +50,8 @@ export class HomePage implements AfterViewInit, OnDestroy {
       canvas.width,
       canvas.height
     );
-    gradBlue.addColorStop(0, '#1a2a8a');
-    gradBlue.addColorStop(1, '#000456');
+    gradBlue.addColorStop(0, '#0054e9');
+    gradBlue.addColorStop(1, '#004acd');
 
     const gradGreen = ctx.createLinearGradient(
       0,
@@ -50,12 +59,12 @@ export class HomePage implements AfterViewInit, OnDestroy {
       canvas.width,
       canvas.height
     );
-    gradGreen.addColorStop(0, '#1e9a1a');
-    gradGreen.addColorStop(1, '#085100');
+    gradGreen.addColorStop(0, '#2dd55b');
+    gradGreen.addColorStop(1, '#28bb50');
 
     const gradRed = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradRed.addColorStop(0, '#c23a3a');
-    gradRed.addColorStop(1, '#650101');
+    gradRed.addColorStop(0, '#c5000f');
+    gradRed.addColorStop(1, '#ad000d');
 
     const dataValues = [this.pagos, this.alugados, this.vazios];
 
@@ -68,7 +77,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
             data: dataValues,
             backgroundColor: [gradBlue, gradGreen, gradRed],
             borderWidth: 0,
-            hoverOffset: 0,
+            hoverOffset: 4,
             spacing: 1,
             borderRadius: 2,
           },
@@ -82,7 +91,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
           legend: { display: false },
           tooltip: { enabled: false },
         },
-        cutout: '70%', 
+        cutout: '70%',
         rotation: -0.5 * Math.PI,
         circumference: 360,
       },

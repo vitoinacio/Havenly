@@ -1,12 +1,8 @@
 import { Routes } from '@angular/router';
-import { HomePage } from './home/home.page';
 
 export const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
-  },
+  { path: '', redirectTo: 'tabs/home', pathMatch: 'full' },
+
   {
     path: 'login',
     loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
@@ -20,13 +16,26 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./register/register.page').then((m) => m.RegisterPage),
   },
+
   {
-    path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
-  },
-  {
-    path: 'properties',
-    loadComponent: () =>
-      import('./properties/properties.page').then((m) => m.PropertiesPage),
+    path: 'tabs',
+    loadComponent: () => import('./tabs/tabs.page').then((m) => m.TabsPage),
+    children: [
+      {
+        path: 'home',
+        loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+      },
+      {
+        path: 'properties',
+        loadComponent: () =>
+          import('./properties/properties.page').then((m) => m.PropertiesPage),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./profile/profile.page').then((m) => m.ProfilePage),
+      },
+      { path: '', redirectTo: '/tabs/home', pathMatch: 'full' },
+    ],
   },
 ];

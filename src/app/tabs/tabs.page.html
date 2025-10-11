@@ -1,0 +1,32 @@
+<ion-tabs>
+  <ion-router-outlet></ion-router-outlet>
+
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button
+      tab="home"
+      [routerLink]="['/tabs/home']"
+      [replaceUrl]="true"
+    >
+      <ion-icon name="pie-chart"></ion-icon>
+      Geral
+    </ion-tab-button>
+
+    <ion-tab-button
+      tab="properties"
+      [routerLink]="['/tabs/properties']"
+      [replaceUrl]="true"
+    >
+      <ion-icon name="home"></ion-icon>
+      Imóveis
+    </ion-tab-button>
+
+    <ion-tab-button
+      tab="profile"
+      [routerLink]="['/tabs/profile']"
+      [replaceUrl]="true"
+    >
+      <ion-icon name="person-circle"></ion-icon>
+      Perfil
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
