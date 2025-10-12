@@ -2,8 +2,16 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner, IonIcon } from '@ionic/angular/standalone';
-import { AuthService } from '../services/auth.service';
+import {
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonButton,
+  IonSpinner,
+  IonIcon,
+} from '@ionic/angular/standalone';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -20,8 +28,8 @@ import { AuthService } from '../services/auth.service';
     IonInput,
     IonButton,
     IonSpinner,
-    IonIcon
-  ]
+    IonIcon,
+  ],
 })
 export class RegisterPage {
   full_name: string = '';
@@ -29,10 +37,7 @@ export class RegisterPage {
   password: string = '';
   confirm: string = '';
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   async onRegister() {
     if (!this.full_name || !this.email || !this.password || !this.confirm) {

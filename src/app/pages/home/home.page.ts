@@ -5,14 +5,12 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import {
-  IonContent,
-  IonButton,
-} from '@ionic/angular/standalone';
+import { IonContent, IonButton } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterLink, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import Chart, { ChartConfiguration } from 'chart.js/auto';
+import { BottomTabsComponent } from "src/app/components/tabss/bottom-tabs.component";
 
 @Component({
   selector: 'app-home',
@@ -23,9 +21,12 @@ import Chart, { ChartConfiguration } from 'chart.js/auto';
     CommonModule,
     RouterModule,
     FormsModule,
-  ],
+    RouterLink,
+    BottomTabsComponent
+],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
+  host: { class: 'ion-page' },
 })
 export class HomePage implements AfterViewInit, OnDestroy {
   @ViewChild('barChart') barChart!: ElementRef<HTMLCanvasElement>;
@@ -39,7 +40,15 @@ export class HomePage implements AfterViewInit, OnDestroy {
     return this.alugados + this.vazios + this.pagos;
   }
 
+  constructor(private router: Router) {}
+
+  goUpgrade() {
+    console.log('navegando...');
+    this.router.navigateByUrl('/upgrade-plan');
+  }
+
   ngAfterViewInit() {
+    console.log('HomePage ngAfterViewInit');
     const canvas = this.barChart.nativeElement;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -101,6 +110,7 @@ export class HomePage implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    console.log('HomePage afterViewInit');
     this.chart?.destroy();
   }
 }
