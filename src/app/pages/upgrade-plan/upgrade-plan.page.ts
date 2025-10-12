@@ -6,29 +6,24 @@ import {
   IonTitle,
   IonButtons,
   IonBackButton,
+  IonButton,
+  IonIcon,
 } from '@ionic/angular/standalone';
 
 @Component({
   standalone: true,
   imports: [
+    IonButton,
     IonContent,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonButtons,
     IonBackButton,
+    IonIcon,
   ],
-  template: `
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button defaultHref="/tabs/home"></ion-back-button>
-        </ion-buttons>
-        <ion-title>Plano Premium</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content> ... </ion-content>
-  `,
+  templateUrl: './upgrade-plan.page.html',
+  styleUrls: ['./upgrade-plan.page.scss'],
+  host: { class: 'ion-page' },
 })
 export class UpgradePlanPage {}
