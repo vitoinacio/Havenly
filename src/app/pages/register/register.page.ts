@@ -51,7 +51,6 @@ export class RegisterPage {
     }
 
     try {
-      // ✅ Cria usuário no Firebase
       await this.authService.register(this.email, this.password);
 
       alert('Usuário registrado com sucesso!');
