@@ -37,10 +37,25 @@
           </div>
         </div>
       </div>
-      <div class="footer">
-        <span
-          >Receita Total: <strong> R$ {{ receitaTotal | number }}</strong></span
-        >
+      <div class="footer-inline">
+        <span class="total-revenue">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          Atual:
+          <strong
+            >{{ receitaAtual | currency:'BRL':'symbol-narrow':'1.0-0' }}</strong
+          >
+        </span>
+
+        <i class="dot">•</i>
+
+        <span class="expected-revenue">
+          <ion-icon name="trending-up-outline"></ion-icon>
+          Previsto:
+          <strong
+            >{{ receitaPrevista | currency:'BRL':'symbol-narrow':'1.0-0'
+            }}</strong
+          >
+        </span>
       </div>
     </section>
     <section class="upgrade-card">

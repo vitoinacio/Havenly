@@ -1,0 +1,179 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/properties"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>{{ property?.name || 'Imóvel' }}</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button size="small" class="btn-edit" (click)="openEdit()">
+        <ion-icon name="create-outline" slot="start"></ion-icon>
+        Editar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content id="containerPage" [fullscreen]="true">
+  <div class="container" *ngIf="property">
+    <div class="info-card">
+      <p><span>Inquilino:</span> {{ property.tenant || 'Nenhum' }}</p>
+      <p>
+        <span>Valor do Aluguel:</span>
+        <span class="price">R$ {{ property.rent | number: '1.2-2' }}</span>
+      </p>
+      <p>
+        <span>Vencimento todo dia:</span>
+        {{ property.dueDate ? (property.dueDate | date: 'dd') : '-' }}
+      </p>
+      <p>
+        <span>Status:</span>
+        <ion-badge [color]="property.status === 'Vazio' ? 'danger' : 'success'">
+          {{ property.status }}
+        </ion-badge>
+      </p>
+    </div>
+
+    <h3 class="section-title">Relatório de Pagamentos - {{ currentYear }}</h3>
+
+    <div class="months-list">
+      <div
+        class="month-row"
+        *ngFor="let m of months"
+        role="button"
+        tabindex="0"
+        (click)="openPayment(m)"
+        (keyup.enter)="openPayment(m)"
+      >
+        <span class="label">{{ m.nome }}</span>
+        <ion-badge
+          [color]="
+            m.status === 'Pago'
+              ? 'success'
+              : m.status === 'Atrasado'
+              ? 'danger'
+              : 'warning'
+          "
+        >
+          {{ m.status }}
+        </ion-badge>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL Pagamento -->
+  <ion-modal
+    *ngIf="isPaymentOpen"
+    [isOpen]="true"
+    (didDismiss)="isPaymentOpen=false"
+    class="property-modal"
+    mode="md"
+    handle="false"
+  >
+    <ng-template>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Pagamento de {{ editingMonth?.nome }}</h2>
+          <button type="button" class="icon-btn" (click)="isPaymentOpen=false">
+            <ion-icon name="close"></ion-icon>
+          </button>
+        </div>
+
+        <form (ngSubmit)="savePayment()" class="form-container">
+          <ion-select
+            label="Status"
+            labelPlacement="stacked"
+            [(ngModel)]="paymentForm.status"
+            name="paymentStatus"
+          >
+            <ion-select-option value="Pendente">Pendente</ion-select-option>
+            <ion-select-option value="Pago">Pago</ion-select-option>
+            <ion-select-option value="Atrasado">Atrasado</ion-select-option>
+          </ion-select>
+
+          <div class="buttons">
+            <ion-button
+              color="medium"
+              type="button"
+              (click)="isPaymentOpen=false"
+            >
+              Cancelar
+            </ion-button>
+            <ion-button color="primary" type="submit">Salvar</ion-button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL Editar imóvel -->
+  <ion-modal
+    [isOpen]="isEditOpen"
+    (didDismiss)="closeEdit()"
+    class="property-modal"
+    mode="md"
+    handle="false"
+  >
+    <ng-template>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Editar Imóvel</h2>
+          <ion-icon name="close" (click)="closeEdit()"></ion-icon>
+        </div>
+
+        <form (ngSubmit)="saveEdit()" class="form-container">
+          <ion-input
+            label="Nome do Imóvel"
+            labelPlacement="stacked"
+            [(ngModel)]="form.name"
+            name="name"
+            required
+          ></ion-input>
+
+          <ion-input
+            label="Inquilino (Opcional)"
+            labelPlacement="stacked"
+            [(ngModel)]="form.tenant"
+            name="tenant"
+          ></ion-input>
+
+          <ion-input
+            label="Preço do Aluguel"
+            labelPlacement="stacked"
+            type="number"
+            [(ngModel)]="form.rent"
+            name="rent"
+            required
+          ></ion-input>
+
+          <ion-input
+            label="Vencimento"
+            labelPlacement="stacked"
+            type="date"
+            [(ngModel)]="form.dueDate"
+            name="dueDate"
+            required
+          ></ion-input>
+
+          <ion-select
+            label="Status"
+            labelPlacement="stacked"
+            [(ngModel)]="form.status"
+            name="status"
+          >
+            <ion-select-option value="Vazio">Vazio</ion-select-option>
+            <ion-select-option value="Alugado">Alugado</ion-select-option>
+          </ion-select>
+
+          <div class="buttons">
+            <ion-button color="medium" type="button" (click)="closeEdit()">
+              Cancelar
+            </ion-button>
+            <ion-button color="primary" type="submit">Salvar</ion-button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+  </ion-modal>
+</ion-content>

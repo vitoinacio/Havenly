@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
@@ -16,16 +16,10 @@ import {
 } from '@ionic/angular/standalone';
 import { BottomTabsComponent } from 'src/app/components/tabss/bottom-tabs.component';
 import { DecimalPipe, CommonModule } from '@angular/common';
-
-type Status = 'Alugado' | 'Vazio' | 'Pago';
-
-interface Property {
-  id: number;
-  title: string;
-  tenant: string;
-  price: number;
-  status: Status;
-}
+import { Router } from '@angular/router';
+import { Property } from 'src/app/models/property.model';
+import { PropertyService } from 'src/app/services/property/property.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-properties',
@@ -50,21 +44,37 @@ interface Property {
     IonSelect,
     IonSelectOption,
   ],
+  providers: [PropertyService],
 })
-export class PropertiesPage implements OnInit {
-  private allProperties: Property[] = [];
+export class PropertiesPage implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
 
+  // Fonte da verdade (Firestore)
+  private allProperties: Property[] = [];
+  // Lista exibida (filtrada)
   properties: Property[] = [];
 
   activeFilter: 'all' | 'rented' | 'vacant' = 'all';
   searchQuery = '';
 
+  constructor(
+    private router: Router,
+    private propertyService: PropertyService
+  ) {}
+
   ngOnInit() {
-    this._idCounter = this.allProperties.reduce(
-      (m, p) => Math.max(m, p.id || 0),
-      0
-    );
-    this.applyFilters();
+    // stream do Firestore
+    this.propertyService
+      .getProperties()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((list: Property[] | null) => {
+      this.allProperties = list ?? [];
+      this.applyFilters();
+      });
+  }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private normalize(s: string): string {
@@ -78,7 +88,6 @@ export class PropertiesPage implements OnInit {
 
   private applyFilters() {
     const q = this.normalize(this.searchQuery);
-
     let list = [...this.allProperties];
 
     if (this.activeFilter === 'rented') {
@@ -90,8 +99,8 @@ export class PropertiesPage implements OnInit {
     if (q) {
       list = list.filter(
         (p) =>
-          this.normalize(p.title).includes(q) ||
-          this.normalize(p.tenant).includes(q)
+          this.normalize(p.name).includes(q) ||
+          this.normalize(p.tenant ?? '').includes(q)
       );
     }
 
@@ -110,13 +119,13 @@ export class PropertiesPage implements OnInit {
   }
 
   isModalOpen = false;
-  newProperty = {
-    address: '',
+  newProperty: Omit<Property, 'id'> = {
+    name: '',
     tenant: '',
-    price: 0,
-    status: 'Vazio' as Status,
+    rent: 0,
+    dueDate: '',
+    status: 'Vazio',
   };
-  private _idCounter = 0;
 
   openModal() {
     this.isModalOpen = true;
@@ -125,23 +134,33 @@ export class PropertiesPage implements OnInit {
     this.isModalOpen = false;
   }
 
-  saveProperty() {
-    const prop: Property = {
-      id: ++this._idCounter,
-      title: this.newProperty.address || 'Novo Imóvel',
+  async saveProperty() {
+    const toSave: Omit<Property, 'id'> = {
+      name: this.newProperty.name?.trim() || 'Novo Imóvel',
       tenant: this.newProperty.tenant?.trim() || 'Disponível',
-      price: Number(this.newProperty.price) || 0,
+      rent: Number(this.newProperty.rent) || 0,
+      dueDate: this.newProperty.dueDate || '',
       status: this.newProperty.status,
     };
 
-    this.allProperties = [prop, ...this.allProperties];
-    this.newProperty = { address: '', tenant: '', price: 0, status: 'Vazio' };
-    this.applyFilters();
-    this.closeModal();
+    try {
+      await this.propertyService.addProperty(toSave as Property);
+      this.newProperty = {
+        name: '',
+        tenant: '',
+        rent: 0,
+        dueDate: '',
+        status: 'Vazio',
+      };
+      this.closeModal();
+    } catch (e) {
+      console.error('Erro ao adicionar imóvel', e);
+    }
   }
 
   selectionMode = false;
   selectedIdx = new Set<number>();
+
   startDeleteMode() {
     this.selectionMode = true;
     this.selectedIdx.clear();
@@ -157,24 +176,34 @@ export class PropertiesPage implements OnInit {
       ? this.selectedIdx.delete(i)
       : this.selectedIdx.add(i);
   }
-
   isSelectedIndex(i: number) {
     return this.selectedIdx.has(i);
   }
 
-  deleteSelected() {
+  async deleteSelected() {
     if (this.selectedIdx.size === 0) {
       this.cancelSelection();
       return;
     }
 
-    const toRemove = new Set<Property>(
-      [...this.selectedIdx].map((i) => this.properties[i])
-    );
+    const selectedDocs = [...this.selectedIdx]
+      .map((i) => this.properties[i])
+      .filter((p) => !!p?.id) as Required<Property>[];
 
-    this.allProperties = this.allProperties.filter((p) => !toRemove.has(p));
+    try {
+      await Promise.all(
+        selectedDocs.map((p) => this.propertyService.deleteProperty(p.id))
+      );
+    } catch (e) {
+      console.error('Erro ao excluir imóveis', e);
+    } finally {
+      this.cancelSelection();
+    }
+  }
 
-    this.applyFilters();
-    this.cancelSelection();
+  goToDetails(property: Property) {
+    this.router.navigate(['/propertie-details', property.id], {
+      state: { property },
+    });
   }
 }
