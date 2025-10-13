@@ -1,8 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from '@angular/fire/auth';
+import {
+  Auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
+} from '@angular/fire/auth';
 
 @Injectable({
-  providedIn: 'root' // garante que o serviço pode ser injetado em qualquer lugar
+  providedIn: 'root',
 })
 export class AuthService {
   constructor(private auth: Auth) {}
@@ -20,5 +26,10 @@ export class AuthService {
   // Resetar senha
   resetPassword(email: string) {
     return sendPasswordResetEmail(this.auth, email);
+  }
+
+  // Logout
+  logout() {
+    return signOut(this.auth);
   }
 }

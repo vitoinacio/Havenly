@@ -48,8 +48,7 @@ export class LoginPage {
 
     try {
       await this.authService.login(this.email, this.password);
-      alert('Login realizado com sucesso!');
-      this.router.navigate(['/home']); // ✅ redireciona para /home
+      this.router.navigate(['/home']);
     } catch (err: any) {
       console.error(err);
       alert('Erro ao fazer login: ' + err.message);
