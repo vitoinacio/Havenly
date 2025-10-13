@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Minha Conta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container">
+    <form>
+      <div class="form-group">
+        <label>Nome Completo</label>
+        <ion-input
+          type="text"
+          placeholder="Digite seu nome"
+          name="name"
+          required
+        ></ion-input>
+      </div>
+
+      <div class="form-group">
+        <label>Endereço de E-mail</label>
+        <ion-input
+          type="email"
+          placeholder="Digite seu e-mail"
+          name="email"
+          required
+        ></ion-input>
+      </div>
+
+      <div class="form-group">
+        <label>Telefone</label>
+        <ion-input
+          type="tel"
+          placeholder="Digite seu telefone"
+          name="phone"
+        ></ion-input>
+      </div>
+
+      <ion-button expand="block" type="submit" class="btn-save">
+        Salvar
+      </ion-button>
+
+      <div class="divider"></div>
+
+      <div class="delete-account" >Excluir Conta</div>
+    </form>
+  </div>
+</ion-content>

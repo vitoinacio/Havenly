@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Ajuda & Suporte</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" id="containerPage">
+  <div class="container">
+    <h2>Perguntas Frequentes</h2>
+
+    <ion-accordion-group>
+      <ion-accordion value="add-property">
+        <ion-item slot="header" color="light">
+          <ion-label>Como adiciono um novo imóvel?</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          Vá para a aba <strong>"Imóveis"</strong>, clique no botão azul ‘+’ e
+          preencha o formulário.
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="edit-property">
+        <ion-item slot="header" color="light">
+          <ion-label>Posso editar um imóvel já cadastrado?</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          Sim, na lista de imóveis, clique no imóvel desejado para ver os
+          detalhes e a opção de editar.
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="data-security">
+        <ion-item slot="header" color="light">
+          <ion-label>Meus dados estão seguros?</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          Sim, utilizamos o Firebase do Google, que oferece alta segurança para
+          todos os seus dados.
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="register-payment">
+        <ion-item slot="header" color="light">
+          <ion-label>Como registro um pagamento?</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          Na tela de detalhes de um imóvel alugado, você encontrará a lista de
+          faturas mensais para registrar os pagamentos.
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="two-step">
+        <ion-item slot="header" color="light">
+          <ion-label>O que é a verificação em duas etapas?</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          É uma camada extra de segurança. Mesmo que alguém saiba sua senha, não
+          conseguirá acessar sua conta sem o código do seu celular.
+        </div>
+      </ion-accordion>
+
+      <ion-accordion value="forgot-password">
+        <ion-item slot="header" color="light">
+          <ion-label>Esqueci minha senha, e agora?</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content">
+          Na tela de login, clique em
+          <strong>"Esqueci minha senha"</strong> para iniciar o processo de
+          recuperação por e-mail.
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+
+    <ion-button expand="block" class="btn-support">
+      Entrar em Contato com o Suporte
+    </ion-button>
+  </div>
+</ion-content>

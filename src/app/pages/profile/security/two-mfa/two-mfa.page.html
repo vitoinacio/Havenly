@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/security"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Ativar 2FA</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" id="containerPage">
+  <div class="container">
+    <p class="description">
+      Use um aplicativo como o Google Authenticator para escanear o código QR.
+    </p>
+
+    <div class="qr-container">
+      <div class="qr-box">
+        <p>QR CODE</p>
+      </div>
+    </div>
+
+    <p class="info-text">
+      Após escanear, insira o código de 6 dígitos gerado pelo aplicativo.
+    </p>
+
+    <form class="form-2fa">
+      <ion-input
+        type="text"
+        maxlength="6"
+        placeholder="------"
+        name="twoFactorCode"
+        required
+        class="code-input"
+      ></ion-input>
+
+      <ion-button expand="block" type="submit"> Verificar e Ativar </ion-button>
+    </form>
+  </div>
+</ion-content>

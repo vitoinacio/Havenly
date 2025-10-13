@@ -1,8 +1,180 @@
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">properties</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="search-bar">
+    <ion-searchbar
+      [debounce]="500"
+      (ionInput)="handleInput($event)"
+    ></ion-searchbar>
+  </div>
+
+  <div class="container">
+    <div class="filter-options">
+      <span [class.active]="activeFilter==='all'" (click)="setFilter('all')"
+        >Todos</span
+      >
+
+      <span
+        [class.active]="activeFilter==='rented'"
+        (click)="setFilter('rented')"
+        >Alugados</span
+      >
+
+      <span
+        [class.active]="activeFilter==='vacant'"
+        (click)="setFilter('vacant')"
+        >Vazios</span
+      >
+    </div>
+
+    <div class="properties-list">
+      @for (property of properties; track $index) {
+      <div
+        class="properties-item"
+        id="{{ property.id }}"
+        (click)="selectionMode ? toggleSelectByIndex($index) : null"
+      >
+        <button
+          *ngIf="selectionMode"
+          class="select-dot"
+          type="button"
+          (click)="$event.stopPropagation(); toggleSelectByIndex($index)"
+          [class.selected]="isSelectedIndex($index)"
+          aria-label="Selecionar imóvel"
+        >
+          <ion-icon
+            [name]="isSelectedIndex($index) ? 'checkmark' : 'ellipse-outline'"
+          ></ion-icon>
+        </button>
+
+        <div class="properties-img">
+          <ion-icon name="home-outline"></ion-icon>
+        </div>
+
+        <div class="properties-info">
+          <p class="property-title">{{ property.title }}</p>
+
+          @if (property.tenant !== 'Disponível') {
+          <p class="property-tenant">Inquilino: {{ property.tenant }}</p>
+          } @else {
+          <p class="property-tenant">Disponível</p>
+          }
+
+          <p class="property-price">
+            Preço: R$ {{ property.price | number:'1.2-2' }}
+          </p>
+        </div>
+
+        <div class="properties-status">
+          <ion-badge
+            [color]="
+              property.status === 'Vazio'
+                ? 'danger'
+                : 'success'
+            "
+          >
+            {{ property.status }}
+          </ion-badge>
+        </div>
+      </div>
+      } @if (properties.length === 0) {
+      <p style="opacity: 0.7; text-align: center; margin-top: 16px">
+        Nenhum imóvel encontrado.
+      </p>
+      }
+    </div>
+  </div>
+
+  <ion-fab
+    slot="fixed"
+    vertical="bottom"
+    horizontal="end"
+    [style.display]="selectionMode ? 'none' : null"
+  >
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button color="danger" (click)="startDeleteMode()">
+        <ion-icon name="trash"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button color="success" (click)="openModal()">
+        <ion-icon name="add-circle"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
+
   <app-bottom-tabs slot="fixed" [active]="'properties'"></app-bottom-tabs>
+
+  <div slot="fixed" class="selection-actions" *ngIf="selectionMode">
+    <ion-button class="pill cancel" color="medium" (click)="cancelSelection()"
+      >Cancelar</ion-button
+    >
+    <ion-button
+      class="pill delete"
+      color="danger"
+      [disabled]="selectedIdx.size === 0"
+      (click)="deleteSelected()"
+    >
+      Excluir
+      <ng-container *ngIf="selectedIdx.size > 0"
+        >&nbsp;({{ selectedIdx.size }})</ng-container
+      >
+    </ion-button>
+  </div>
+
+  <ion-modal
+    [isOpen]="isModalOpen"
+    (didDismiss)="closeModal()"
+    class="property-modal"
+    mode="md"
+    handle="false"
+  >
+    <ng-template>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Cadastrar Imóvel</h2>
+          <ion-icon name="close" (click)="closeModal()"></ion-icon>
+        </div>
+
+        <form (ngSubmit)="saveProperty()" class="form-container">
+          <ion-input
+            label="Endereço"
+            labelPlacement="stacked"
+            [(ngModel)]="newProperty.address"
+            name="address"
+            required
+          ></ion-input>
+          <ion-input
+            label="Inquilino (Opcional)"
+            labelPlacement="stacked"
+            [(ngModel)]="newProperty.tenant"
+            name="tenant"
+          ></ion-input>
+          <ion-input
+            label="Valor do Aluguel"
+            labelPlacement="stacked"
+            type="number"
+            [(ngModel)]="newProperty.price"
+            name="price"
+          ></ion-input>
+
+          <ion-select
+            label="Status"
+            labelPlacement="stacked"
+            [(ngModel)]="newProperty.status"
+            name="status"
+          >
+            <ion-select-option value="Vazio">Vazio</ion-select-option>
+            <ion-select-option value="Alugado">Alugado</ion-select-option>
+          </ion-select>
+
+          <div class="buttons">
+            <ion-button color="medium" type="button" (click)="closeModal()"
+              >Cancelar</ion-button
+            >
+            <ion-button color="primary" type="submit">Salvar</ion-button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+  </ion-modal>
 </ion-content>

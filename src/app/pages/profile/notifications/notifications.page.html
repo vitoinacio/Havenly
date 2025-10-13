@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Notificações</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" id="containerPage">
+  <div class="container">
+    <div class="item-notification">
+      <p>Pagamentos Recebidos</p>
+      <ion-toggle
+        color="primary"
+      ></ion-toggle>
+    </div>
+
+    <div class="item-notification">
+      <p>Lembretes de Vencimento</p>
+      <ion-toggle
+        color="primary"
+      ></ion-toggle>
+    </div>
+  </div>
+</ion-content>

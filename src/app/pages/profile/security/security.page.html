@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Segurança</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" id="containerPage">
+  <div class="container">
+    <div class="security-item" [routerLink]="['/change-password']">
+      <p class="title">Alterar Senha</p>
+      <ion-icon name="key-outline"></ion-icon>
+    </div>
+
+    <div class="security-item two-step">
+      <div class="info">
+        <p class="title">Verificação em Duas Etapas</p>
+        <p class="subtitle">
+          <!-- {{ isTwoFactorEnabled ? 'Ativada' : 'Desativada' }} -->
+          Desativada
+        </p>
+      </div>
+      <ion-button size="small" [routerLink]="['/two-mfa']">
+        <!-- {{ isTwoFactorEnabled ? 'Desativar' : 'Ativar' }} -->
+        Ativar
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

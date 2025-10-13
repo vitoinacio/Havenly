@@ -43,4 +43,28 @@ export const routes: Routes = [
         (m) => m.UpgradePlanPage
       ),
   },
+  {
+    path: 'my-account',
+    loadComponent: () => import('./pages/profile/my-account/my-account.page').then( m => m.MyAccountPage)
+  },
+  {
+    path: 'notifications',
+    loadComponent: () => import('./pages/profile/notifications/notifications.page').then( m => m.NotificationsPage)
+  },
+  {
+    path: 'security',
+    loadComponent: () => import('./pages/profile/security/security.page').then( m => m.SecurityPage)
+  },
+  {
+    path: 'help-support',
+    loadComponent: () => import('./pages/profile/help-support/help-support.page').then( m => m.HelpSupportPage)
+  },
+  {
+    path: 'two-mfa',
+    loadComponent: () => import('./pages/profile/security/two-mfa/two-mfa.page').then( m => m.TwoMFAPage)
+  },
+  {
+    path: 'change-password',
+    loadComponent: () => import('./pages/profile/security/change-password/change-password.page').then( m => m.ChangePasswordPage)
+  },
 ];
