@@ -35,7 +35,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('barChart') barChart!: ElementRef<HTMLCanvasElement>;
   private destroy$ = new Subject<void>();
-  chart?: Chart;
+  private chart?: Chart;
 
   totalImoveis = 0;
   alugados = 0;
@@ -60,82 +60,64 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         this.receitaAtual = stats.revenuePaidThisMonth;
         this.receitaPrevista = stats.revenueExpectedThisMonth;
 
-        this.updateChart();
+        this.initOrUpdateChart();
       });
   }
 
-  goUpgrade() {
-    this.router.navigateByUrl('/upgrade-plan');
+  ngAfterViewInit() {
+    requestAnimationFrame(() => this.initOrUpdateChart());
   }
 
-  ngAfterViewInit() {
-    const canvas = this.barChart.nativeElement;
+  private initOrUpdateChart() {
+    const canvas = this.barChart?.nativeElement;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const gradBlue = ctx.createLinearGradient(
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-    gradBlue.addColorStop(0, '#0054e9');
-    gradBlue.addColorStop(1, '#004acd');
+    const dataValues = [this.pagos, this.alugados, this.vazios];
 
-    const gradGreen = ctx.createLinearGradient(
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-    gradGreen.addColorStop(0, '#2dd55b');
-    gradGreen.addColorStop(1, '#28bb50');
+    const colors = ['#3b82f6', '#22c55e', '#ef4444'];
 
-    const gradRed = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradRed.addColorStop(0, '#c5000f');
-    gradRed.addColorStop(1, '#ad000d');
-
-    const config: ChartConfiguration<'doughnut'> = {
-      type: 'doughnut',
-      data: {
-        labels: ['Pagos (mês)', 'Alugados', 'Vazios'],
-        datasets: [
-          {
-            data: [this.pagos, this.alugados, this.vazios], // inicial
-            backgroundColor: [gradBlue, gradGreen, gradRed],
-            borderWidth: 0,
-            hoverOffset: 4,
-            spacing: 1,
-            borderRadius: 2,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 600 },
-        plugins: {
-          legend: { display: false },
-          tooltip: { enabled: false },
+    if (!this.chart) {
+      const config: ChartConfiguration<'doughnut'> = {
+        type: 'doughnut',
+        data: {
+          labels: ['Pagos (mês)', 'Alugados', 'Vazios'],
+          datasets: [
+            {
+              data: dataValues,
+              backgroundColor: colors,
+              borderWidth: 0,
+              hoverOffset: 4,
+              spacing: 1,
+              borderRadius: 2,
+            },
+          ],
         },
-        cutout: '70%',
-        rotation: -0.5 * Math.PI,
-        circumference: 360,
-      },
-    };
-
-    this.chart = new Chart(ctx, config);
-  }
-
-  private updateChart() {
-    if (!this.chart) return;
-    this.chart.data.datasets[0].data = [this.pagos, this.alugados, this.vazios];
-    this.chart.update();
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 400 },
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          cutout: '70%',
+          rotation: -0.5 * Math.PI,
+          circumference: 360,
+        },
+      };
+      this.chart = new Chart(ctx, config);
+    } else {
+      this.chart.data.datasets[0].data = dataValues as any;
+      this.chart.update();
+    }
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
     this.chart?.destroy();
+  }
+
+  goUpgrade() {
+    this.router.navigateByUrl('/upgrade-plan');
   }
 }
