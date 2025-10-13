@@ -1,12 +1,17 @@
 import {
   Component,
+  OnInit,
   AfterViewInit,
   OnDestroy,
   ViewChild,
   ElementRef,
-  OnInit,
 } from '@angular/core';
-import { IonContent, IonButton, IonIcon } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonButton,
+  IonIcon,
+  Platform,
+} from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -36,6 +41,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('barChart') barChart!: ElementRef<HTMLCanvasElement>;
   private destroy$ = new Subject<void>();
   private chart?: Chart;
+  private ro?: ResizeObserver;
 
   totalImoveis = 0;
   alugados = 0;
@@ -45,7 +51,11 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   receitaAtual = 0;
   receitaPrevista = 0;
 
-  constructor(private router: Router, private dashboard: Dashboard) {}
+  constructor(
+    private router: Router,
+    private dashboard: Dashboard,
+    private platform: Platform
+  ) {}
 
   ngOnInit() {
     this.dashboard
@@ -65,18 +75,39 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    requestAnimationFrame(() => this.initOrUpdateChart());
+
+    this.platform.ready().then(() => {
+
+      const parent = this.barChart?.nativeElement?.parentElement;
+      if (parent && 'ResizeObserver' in window) {
+        this.ro = new ResizeObserver(() => this.initOrUpdateChart());
+        this.ro.observe(parent);
+      }
+
+      requestAnimationFrame(() => this.initOrUpdateChart());
+      setTimeout(() => this.initOrUpdateChart(), 150);
+    });
   }
 
   private initOrUpdateChart() {
     const canvas = this.barChart?.nativeElement;
     if (!canvas) return;
+
+    const parent = canvas.parentElement;
+    const hasSize =
+      !!parent && parent.clientWidth > 0 && parent.clientHeight > 0;
+    if (!hasSize) return;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const dataValues = [this.pagos, this.alugados, this.vazios];
-
-    const colors = ['#3b82f6', '#22c55e', '#ef4444'];
+    const data = [this.pagos, this.alugados, this.vazios];
+    const sum = data.reduce((a, b) => a + b, 0);
+    const values = sum > 0 ? data : [1, 0, 0];
+    const colors =
+      sum > 0
+        ? ['#3b82f6', '#22c55e', '#ef4444']
+        : ['#e5e7eb', '#e5e7eb', '#e5e7eb'];
 
     if (!this.chart) {
       const config: ChartConfiguration<'doughnut'> = {
@@ -85,7 +116,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
           labels: ['Pagos (mês)', 'Alugados', 'Vazios'],
           datasets: [
             {
-              data: dataValues,
+              data: values,
               backgroundColor: colors,
               borderWidth: 0,
               hoverOffset: 4,
@@ -97,7 +128,7 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: { duration: 400 },
+          animation: { duration: 300 },
           plugins: { legend: { display: false }, tooltip: { enabled: false } },
           cutout: '70%',
           rotation: -0.5 * Math.PI,
@@ -106,12 +137,14 @@ export class HomePage implements OnInit, AfterViewInit, OnDestroy {
       };
       this.chart = new Chart(ctx, config);
     } else {
-      this.chart.data.datasets[0].data = dataValues as any;
+      this.chart.data.datasets[0].data = values as any;
+      (this.chart.data.datasets[0] as any).backgroundColor = colors;
       this.chart.update();
     }
   }
 
   ngOnDestroy() {
+    this.ro?.disconnect();
     this.destroy$.next();
     this.destroy$.complete();
     this.chart?.destroy();
