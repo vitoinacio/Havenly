@@ -33,6 +33,6 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    ...firebaseProviders // ✅ isso injeta o Auth corretamente
+    ...firebaseProviders
   ]
 });

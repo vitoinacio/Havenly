@@ -1,0 +1,309 @@
+.search-bar {
+  padding: 10px 15px 0 15px;
+
+  ion-searchbar {
+    --background: var(--ion-color-light-shade);
+    --border-radius: 8px;
+  }
+}
+
+ion-content,
+ion-content::part(scroll) {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+ion-content::-webkit-scrollbar,
+ion-content::part(scroll)::-webkit-scrollbar {
+  display: none !important;
+}
+
+.container {
+  padding: 0 25px calc(10px + env(safe-area-inset-bottom)) 25px;
+
+  .filter-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    gap: 10px;
+
+    span {
+      font-size: 16px;
+      font-weight: 600;
+      background: var(--ion-color-primary);
+      color: white;
+      text-align: center;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+
+      &:hover {
+        background: var(--ion-color-primary-shade);
+      }
+    }
+  }
+
+  .properties-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 100px;
+
+    .properties-item {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      border-radius: 16px;
+      padding: 10px 10px;
+      background: linear-gradient(
+        135deg,
+        var(--ion-color-light-tint) 0%,
+        var(--ion-color-light-shade) 100%
+      );
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+
+      .properties-img {
+        flex: 15%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20%;
+        overflow: hidden;
+        background: var(--ion-color-medium);
+        width: 70px;
+        height: 70px;
+      }
+
+      .properties-info {
+        flex: 75%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        line-height: 0.005;
+
+        .property-title {
+          font-size: 12px;
+          font-weight: bold;
+          color: var(--ion-color-medium);
+        }
+
+        .property-tenant {
+          font-size: 12px;
+          color: var(--ion-color-medium);
+        }
+
+        .property-price {
+          font-size: 12px;
+          font-weight: bold;
+          color: var(--ion-color-primary);
+        }
+      }
+
+      .properties-status {
+        flex: 10%;
+
+        ion-badge {
+          color: white;
+          width: 60px;
+        }
+      }
+    }
+  }
+}
+
+ion-fab {
+  margin-bottom: 80px;
+  margin-right: 20px;
+  ion-fab-button {
+    --color: white;
+  }
+
+  ion-fab-list {
+    ion-fab-button {
+      ion-icon {
+        color: white;
+      }
+    }
+  }
+}
+
+.modal-container {
+  background: var(--ion-color-light);
+  border-radius: 16px;
+  padding: 22px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  ion-icon {
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--ion-color-medium);
+    transition: 0.2s;
+    &:hover {
+      color: var(--ion-color-light);
+    }
+  }
+}
+
+.properties-list .properties-item {
+  position: relative;
+}
+
+.select-dot {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-color-medium);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+
+  ion-icon {
+    font-size: 14px;
+    color: white;
+  }
+
+  &.selected {
+    background: var(--ion-color-danger);
+  }
+}
+
+/* Ações de seleção – botão flutuante no rodapé (não faixa inteira) */
+.selection-actions {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom) + 78px); /* acima da bottom-tab */
+  display: flex;
+  gap: 10px;
+  z-index: 30;
+}
+
+.selection-actions .pill {
+  --border-radius: 999px;
+  padding: 0 18px;
+  height: 44px;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.selection-actions .pill.delete {
+  --background: var(--ion-color-danger);
+  --color: #fff;
+}
+
+.selection-actions .pill.cancel {
+  --background: var(--ion-color-medium);
+  --color: #fff;
+}
+
+ion-modal.property-modal {
+  --width: min(520px, 92vw);
+  --max-height: 86vh;
+  --border-radius: 16px;
+  --box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+ion-modal.property-modal::part(backdrop) {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+ion-modal.property-modal::part(content) {
+  background: transparent;
+  padding: 0;
+  display: block;
+}
+
+.modal-container {
+  background: var(--ion-color-light);
+  border-radius: 16px;
+  padding: 22px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+.modal-header ion-icon {
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--ion-color-medium);
+  transition: 0.2s;
+}
+.modal-header ion-icon:hover {
+  color: var(--ion-color-light);
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.form-container ion-input,
+.form-container ion-select {
+  --color: #fff;
+  --padding-start: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--ion-color-medium);
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+.buttons ion-button {
+  font-weight: 600;
+  min-width: 100px;
+}
+.buttons ion-button[color="medium"] {
+  --background: var(--ion-color-medium);
+  --color: white;
+}
+.buttons ion-button[color="primary"] {
+  --background: var(--ion-color-primary);
+  --color: white;
+}
+ 
+@media (max-width: 480px) {
+  ion-modal.property-modal {
+    --width: calc(100vw - 24px);
+    --max-height: 88vh;
+    --border-radius: 14px;
+  }
+  .selection-actions {
+    bottom: calc(env(safe-area-inset-bottom) + 86px);
+  }
+}

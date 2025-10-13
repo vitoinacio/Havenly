@@ -2,10 +2,16 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { IonContent, IonItem, IonLabel, IonInput, IonButton, IonSpinner } from '@ionic/angular/standalone';
-import { AuthService } from '../services/auth.service';
+import {
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonButton,
+  IonSpinner,
+} from '@ionic/angular/standalone';
+import { AuthService } from '../../services/auth/auth.service';
 import { IonIcon } from '@ionic/angular/standalone';
-
 
 @Component({
   selector: 'app-login',
@@ -22,18 +28,15 @@ import { IonIcon } from '@ionic/angular/standalone';
     IonInput,
     IonButton,
     IonSpinner,
-    IonIcon
-  ]
+    IonIcon,
+  ],
 })
 export class LoginPage {
   email: string = '';
   password: string = '';
   loading: boolean = false;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   async onLogin() {
     if (!this.email || !this.password) {

@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" id="containerPage">
+  <div class="container">
+    <section class="header-perfil">
+      <div class="img-container">
+        <img src="../../../assets/user.png" alt="foto de perfil" />
+        <div>
+          <ion-icon name="pencil-outline"></ion-icon>
+        </div>
+      </div>
+      <div class="user-info">
+        <h2>Havenly</h2>
+        <p>havenly@gmail.com</p>
+      </div>
+    </section>
+
+    <div class="card-upgrade" [routerLink]="['/upgrade-plan']">
+      <h3>✨ Seja Havenly Premium</h3>
+      <p>Imóveis ilimitados e dashboard completo!</p>
+    </div>
+
+    <div class="container-config">
+      @for (item of itemsConfig; track item) {
+      <div class="card-config" [routerLink]="[item.href]">
+        <ion-icon [name]="item.icon" slot="start"></ion-icon>
+        <p>{{ item.text }}</p>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </div>
+      }
+    </div>
+
+    <div class="card-logout">
+      <ion-icon [name]="'log-out-outline'" slot="start"></ion-icon>
+      <p>Sair</p>
+    </div>
+  </div>
+  <app-bottom-tabs slot="fixed" [active]="'profile'"></app-bottom-tabs>
+</ion-content>

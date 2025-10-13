@@ -2,8 +2,14 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
-import { AuthService } from '../services/auth.service';
+import {
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonButton,
+} from '@ionic/angular/standalone';
+import { AuthService } from '../../services/auth/auth.service';
 import { IonicModule } from '@ionic/angular';
 
 @Component({
@@ -21,15 +27,12 @@ import { IonicModule } from '@ionic/angular';
     IonInput,
     IonButton,
     IonicModule,
-  ]
+  ],
 })
 export class ResetPage {
   email: string = '';
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   async onReset() {
     if (!this.email) {

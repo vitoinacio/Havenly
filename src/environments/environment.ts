@@ -6,14 +6,15 @@ export const environment = {
   production: false,
 
   firebaseConfig: {
-    apiKey: "AIzaSyBcI6x1YZ5i3zGyfWE24uDLa21-wRJmexg",
-    authDomain: "havenly-27a58.firebaseapp.com",
-    projectId: "havenly-27a58",
-    storageBucket: "havenly-27a58.firebasestorage.app",
-    messagingSenderId: "885069263109",
-    appId: "1:885069263109:web:86fe8ca845252813ddc76c",
-    measurementId: "G-RWDLE7WFK5"
-  }
+    apiKey: 'AIzaSyAUtMlqnnTU-EZxJ8F0-3n3ZvmyOOze8FE',
+    authDomain: 'havenly-b018c.firebaseapp.com',
+    projectId: 'havenly-b018c',
+    //storageBucket: "havenly-b018c.firebasestorage.app",
+    storageBucket: 'havenly-b018c.appspot.com',
+    messagingSenderId: '526082973455',
+    appId: '1:526082973455:web:c4e8c735c93555be7c687a',
+    measurementId: 'G-YNW1QJ9BCM',
+  },
 };
 
 /*
