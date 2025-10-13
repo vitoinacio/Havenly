@@ -175,6 +175,19 @@
       }
     }
 
+    .summary-card .chart-wrap {
+      position: relative;
+      height: 160px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .summary-card .chart-wrap canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
     .upgrade-card {
       margin-top: 25px;
       gap: 12px;
