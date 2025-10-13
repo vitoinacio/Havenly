@@ -1,0 +1,1 @@
+export type PropertyPayStatus = 'Pago' | 'Pendente' | 'Atrasado';

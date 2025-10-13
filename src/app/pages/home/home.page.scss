@@ -138,14 +138,40 @@
         }
       }
 
-      .footer {
+      .footer-inline {
+        display: flex;
+        gap: 5%;
         grid-column: span 2;
-        margin-top: 6px;
-        font-weight: 600;
-
-        strong {
-          font-weight: 800;
+      }
+      .footer-inline span {
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+        width: 90%;
+        padding: 5px 10px;
+        border-radius: 10px;
+        gap: 2px;
+      }
+      .total-revenue {
+        border: 1px solid var(--ion-color-success);
+        ion-icon {
+          color: var(--ion-color-success);
         }
+        strong {
+          color: var(--ion-color-success);
+        }
+      }
+      .expected-revenue {
+        border: 1px solid var(--ion-color-warning);
+        ion-icon {
+          color: var(--ion-color-warning);
+        }
+        strong {
+          color: var(--ion-color-warning);
+        }
+      }
+      .footer-inline .dot {
+        opacity: 0.5;
       }
     }
 

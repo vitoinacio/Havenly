@@ -11,13 +11,11 @@
       <span [class.active]="activeFilter==='all'" (click)="setFilter('all')"
         >Todos</span
       >
-
       <span
         [class.active]="activeFilter==='rented'"
         (click)="setFilter('rented')"
         >Alugados</span
       >
-
       <span
         [class.active]="activeFilter==='vacant'"
         (click)="setFilter('vacant')"
@@ -30,7 +28,7 @@
       <div
         class="properties-item"
         id="{{ property.id }}"
-        (click)="selectionMode ? toggleSelectByIndex($index) : null"
+        (click)="selectionMode ? toggleSelectByIndex($index) : goToDetails(property)"
       >
         <button
           *ngIf="selectionMode"
@@ -50,26 +48,25 @@
         </div>
 
         <div class="properties-info">
-          <p class="property-title">{{ property.title }}</p>
+          <p class="property-title">{{ property.name }}</p>
 
-          @if (property.tenant !== 'Disponível') {
+          @if (property.tenant && property.tenant !== 'Disponível') {
           <p class="property-tenant">Inquilino: {{ property.tenant }}</p>
           } @else {
           <p class="property-tenant">Disponível</p>
           }
 
           <p class="property-price">
-            Preço: R$ {{ property.price | number:'1.2-2' }}
+            Preço: R$ {{ property.rent | number:'1.2-2' }}
+          </p>
+          <p class="property-due">
+            Vencimento dia: {{ property.dueDate | date:'dd' }}
           </p>
         </div>
 
         <div class="properties-status">
           <ion-badge
-            [color]="
-              property.status === 'Vazio'
-                ? 'danger'
-                : 'success'
-            "
+            [color]="property.status === 'Vazio' ? 'danger' : 'success'"
           >
             {{ property.status }}
           </ion-badge>
@@ -137,24 +134,36 @@
 
         <form (ngSubmit)="saveProperty()" class="form-container">
           <ion-input
-            label="Endereço"
+            label="Nome do Imóvel"
             labelPlacement="stacked"
-            [(ngModel)]="newProperty.address"
-            name="address"
+            [(ngModel)]="newProperty.name"
+            name="name"
             required
           ></ion-input>
+
           <ion-input
             label="Inquilino (Opcional)"
             labelPlacement="stacked"
             [(ngModel)]="newProperty.tenant"
             name="tenant"
           ></ion-input>
+
           <ion-input
-            label="Valor do Aluguel"
+            label="Preço do Aluguel"
             labelPlacement="stacked"
             type="number"
-            [(ngModel)]="newProperty.price"
-            name="price"
+            [(ngModel)]="newProperty.rent"
+            name="rent"
+            required
+          ></ion-input>
+
+          <ion-input
+            label="Vencimento (AAAA-MM-DD)"
+            labelPlacement="stacked"
+            type="date"
+            [(ngModel)]="newProperty.dueDate"
+            name="dueDate"
+            required
           ></ion-input>
 
           <ion-select
