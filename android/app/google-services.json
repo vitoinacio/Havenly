@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "526082973455",
+    "project_id": "havenly-b018c",
+    "storage_bucket": "havenly-b018c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:526082973455:android:700243046189f2387c687a",
+        "android_client_info": {
+          "package_name": "com.havenly.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "526082973455-81f5gglnbnf6ted90d1o5vft3icvaf1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7-6VLSO2fLnr-pnsZUe3-uLcguYAkGDw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "526082973455-81f5gglnbnf6ted90d1o5vft3icvaf1d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

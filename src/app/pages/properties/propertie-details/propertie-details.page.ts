@@ -22,6 +22,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Property } from 'src/app/models/property.model';
 import { PropertyService } from 'src/app/services/property/property.service';
 import { PropertyPayStatus } from 'src/app/models/property-pay-status';
+import { ToastService } from 'src/app/services/toast/toast';
 
 @Component({
   selector: 'app-property-details',
@@ -63,7 +64,8 @@ export class PropertieDetailsPage implements OnDestroy {
   paymentForm: { status: PropertyPayStatus } = { status: 'Pendente' };
 
   isEditOpen = false;
-  form: Omit<Property, 'id'> & { photo?: string } = {
+
+  form: Partial<Omit<Property, 'id' | 'ownerId'>> & { photo?: string } = {
     name: '',
     tenant: '',
     rent: 0,
@@ -73,7 +75,8 @@ export class PropertieDetailsPage implements OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private propertyService: PropertyService
+    private propertyService: PropertyService,
+    private toast: ToastService
   ) {
     const paramId = this.route.snapshot.paramMap.get('id') ?? '';
     const navState = history.state?.property as Property | undefined;
@@ -115,15 +118,9 @@ export class PropertieDetailsPage implements OnDestroy {
 
     this.months = nomes.map((nome, idx) => {
       let status: PropertyPayStatus = 'Pendente';
-
-      if (idx < currentMonth) {
-        status = 'Atrasado';
-      } else if (idx === currentMonth) {
+      if (idx < currentMonth) status = 'Atrasado';
+      else if (idx === currentMonth)
         status = today.getDate() <= dueDay ? 'Pendente' : 'Atrasado';
-      } else {
-        status = 'Pendente';
-      }
-
       return { idx, nome, status };
     });
   }
@@ -168,8 +165,14 @@ export class PropertieDetailsPage implements OnDestroy {
       await this.propertyService.updateProperty(this.property.id, {
         [fieldPath]: this.paymentForm.status,
       } as any);
+
+      this.toast.show(
+        `Pagamento de ${this.editingMonth.nome} salvo!`,
+        'success'
+      );
     } catch (e) {
       console.error('Erro ao salvar status do mês', e);
+      this.toast.show('Erro ao salvar pagamento.', 'danger'); // 👈
     }
 
     this.closePayment();
@@ -196,17 +199,17 @@ export class PropertieDetailsPage implements OnDestroy {
     if (!this.property) return;
 
     const photoClean = this.form.photo ? String(this.form.photo).trim() : '';
-    const patch: Partial<Omit<Property, 'id'>> = {
-      name: this.form.name?.trim() || this.property.name,
-      tenant: (this.form.tenant ?? '').trim() || 'Disponível',
-      rent: Number(this.form.rent) || 0,
-      dueDate: this.form.dueDate || '',
-      status: this.form.status,
+    const patch: Partial<Omit<Property, 'id' | 'ownerId'>> = {
+      name: (this.form.name ?? this.property.name)?.toString().trim(),
+      tenant: (this.form.tenant ?? '').toString().trim() || 'Disponível',
+      rent: Number(this.form.rent ?? this.property.rent) || 0,
+      dueDate: this.form.dueDate ?? this.property.dueDate ?? '',
+      status: (this.form.status ?? this.property.status) as Property['status'],
       ...(photoClean ? { photo: photoClean } : {}),
     };
 
     try {
-      await this.propertyService.updateProperty(this.property.id, patch);
+      await this.propertyService.updateProperty(this.property.id, patch as any);
       this.property = { ...this.property, ...patch };
 
       this.recomputeMonths();
@@ -216,9 +219,11 @@ export class PropertieDetailsPage implements OnDestroy {
         delete (this.property as any).photo;
       }
 
+      this.toast.show('Imóvel atualizado com sucesso!', 'success');
       this.closeEdit();
     } catch (e) {
       console.error('Erro ao atualizar imóvel', e);
+      this.toast.show('Erro ao atualizar imóvel.', 'danger');
     }
   }
 

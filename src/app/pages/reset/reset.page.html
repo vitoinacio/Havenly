@@ -19,15 +19,19 @@
           inputmode="email"
           autocomplete="email"
           name="email"
+          required
         ></ion-input>
       </ion-item>
 
-      <ion-button expand="block" type="submit" class="mt-20">
-        <ion-spinner
-          name="lines-small"
-          style="margin-right: 8px; display: none"
-        ></ion-spinner>
-        Enviar link de recuperação
+      <ion-button
+        expand="block"
+        type="submit"
+        class="mt-20"
+        [disabled]="loading"
+      >
+        @if (loading) {
+        <ion-spinner name="lines-small" style="margin-right: 8px"></ion-spinner>
+        } Enviar link de recuperação
       </ion-button>
     </form>
   </div>

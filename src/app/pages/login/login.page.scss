@@ -1,20 +1,7 @@
-/* GLOBAL RESET */
-* {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-/* CONTAINER */
 #containerPage {
   --padding-start: 25px;
   --padding-end: 25px;
-  --padding-top: 0;
+  --padding-top: 25px;
   --padding-bottom: 0;
   padding-left: var(--padding-start);
   padding-right: var(--padding-end);
@@ -22,9 +9,8 @@ html, body {
   padding-bottom: var(--padding-bottom);
 }
 
-/* HEADER */
-.header {
-  margin: 50px 0;
+#containerPage .header {
+  margin: 100px 0 40px 0;
 }
 
 .header p {
@@ -134,16 +120,16 @@ html, body {
   --padding-top: 0;
   --padding-bottom: 0;
   --border-radius: 50%;
-  --box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  --box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   border: none;
 }
 
 #btnGoogle::part(native),
 #btnFacebook::part(native) {
-  width: 70px;
+  width: 150px !important;
   height: 70px;
-  max-width: 100%;
-  border-radius: 50%;
+  width: 100%;
+  border-radius: 10px;
   justify-content: center;
   align-items: center;
   display: inline-flex;
@@ -158,7 +144,7 @@ html, body {
 
 #btnFacebook .facebook-icon {
   font-size: 30px;
-  color: var(--ion-color-primary); 
+  color: var(--ion-color-primary);
 }
 
 /* RESPONSIVE DESIGN */
@@ -189,7 +175,7 @@ html, body {
 
   #btnGoogle::part(native),
   #btnFacebook::part(native) {
-    width: 60px;
+    width: 150px;
     height: 60px;
   }
 

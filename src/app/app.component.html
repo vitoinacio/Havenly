@@ -1,3 +1,17 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
+  @if (loading){
+  <div
+    class="splash"
+    style="
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: var(--ion-background-color);
+    "
+  >
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+  }
 </ion-app>

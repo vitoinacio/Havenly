@@ -15,6 +15,7 @@
           autocomplete="name"
           name="full_name"
           [(ngModel)]="full_name"
+          required
         ></ion-input>
       </ion-item>
 
@@ -26,6 +27,7 @@
           autocomplete="email"
           name="email"
           [(ngModel)]="email"
+          required
         ></ion-input>
       </ion-item>
 
@@ -37,6 +39,7 @@
           autocomplete="new-password"
           name="password"
           [(ngModel)]="password"
+          required
         ></ion-input>
       </ion-item>
 
@@ -47,15 +50,19 @@
           autocomplete="new-password"
           name="confirm"
           [(ngModel)]="confirm"
+          required
         ></ion-input>
       </ion-item>
 
-      <ion-button expand="block" type="submit" class="mt-20">
-        <ion-spinner
-          name="lines-small"
-          style="margin-right: 8px; display: none"
-        ></ion-spinner>
-        Criar Conta
+      <ion-button
+        expand="block"
+        type="submit"
+        class="mt-20"
+        [disabled]="loading"
+      >
+        @if (loading) {
+        <ion-spinner name="lines-small" style="margin-right: 8px"></ion-spinner>
+        } Criar Conta
       </ion-button>
     </form>
   </div>
@@ -68,9 +75,12 @@
   <div class="divider"><span></span> ou <span></span></div>
 
   <div class="social">
-    <!-- Google: fundo branco, G multicolorido -->
-    <ion-button id="btnGoogle" aria-label="Entrar com Google" >
-      <!-- SVG oficial multicolor do "G" (simplificado) -->
+    <ion-button
+      id="btnGoogle"
+      aria-label="Entrar com Google"
+      (click)="loginGoogle()"
+      [disabled]="loading"
+    >
       <svg class="g-icon" viewBox="0 0 48 48" aria-hidden="true">
         <path
           fill="#EA4335"
@@ -91,7 +101,12 @@
       </svg>
     </ion-button>
 
-    <ion-button id="btnFacebook" aria-label="Entrar com Facebook" >
+    <ion-button
+      id="btnFacebook"
+      aria-label="Entrar com Facebook"
+      (click)="loginFacebook()"
+      [disabled]="loading"
+    >
       <ion-icon name="logo-facebook" class="facebook-icon"></ion-icon>
     </ion-button>
   </div>

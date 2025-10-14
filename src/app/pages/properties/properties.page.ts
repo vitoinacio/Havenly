@@ -1,5 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+
 import {
   IonContent,
   IonSearchbar,
@@ -14,12 +18,10 @@ import {
   IonSelect,
   IonSelectOption,
 } from '@ionic/angular/standalone';
+
 import { BottomTabsComponent } from 'src/app/components/tabss/bottom-tabs.component';
-import { DecimalPipe, CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { Property } from 'src/app/models/property.model';
+import { Property, NewProperty } from 'src/app/models/property.model';
 import { PropertyService } from 'src/app/services/property/property.service';
-import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-properties',
@@ -48,10 +50,7 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class PropertiesPage implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-
-  // Fonte da verdade (Firestore)
   private allProperties: Property[] = [];
-  // Lista exibida (filtrada)
   properties: Property[] = [];
 
   activeFilter: 'all' | 'rented' | 'vacant' = 'all';
@@ -63,15 +62,15 @@ export class PropertiesPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // stream do Firestore
     this.propertyService
       .getProperties()
       .pipe(takeUntil(this.destroy$))
       .subscribe((list: Property[] | null) => {
-      this.allProperties = list ?? [];
-      this.applyFilters();
+        this.allProperties = list ?? [];
+        this.applyFilters();
       });
   }
+
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
@@ -119,7 +118,8 @@ export class PropertiesPage implements OnInit, OnDestroy {
   }
 
   isModalOpen = false;
-  newProperty: Omit<Property, 'id'> = {
+
+  newProperty: NewProperty = {
     name: '',
     tenant: '',
     rent: 0,
@@ -135,7 +135,7 @@ export class PropertiesPage implements OnInit, OnDestroy {
   }
 
   async saveProperty() {
-    const toSave: Omit<Property, 'id'> = {
+    const toSave: NewProperty = {
       name: this.newProperty.name?.trim() || 'Novo Imóvel',
       tenant: this.newProperty.tenant?.trim() || 'Disponível',
       rent: Number(this.newProperty.rent) || 0,
@@ -144,7 +144,7 @@ export class PropertiesPage implements OnInit, OnDestroy {
     };
 
     try {
-      await this.propertyService.addProperty(toSave as Property);
+      await this.propertyService.addProperty(toSave);
       this.newProperty = {
         name: '',
         tenant: '',

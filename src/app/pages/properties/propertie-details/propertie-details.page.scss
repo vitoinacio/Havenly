@@ -11,6 +11,17 @@ ion-toolbar .btn-edit {
   height: 32px;
   line-height: 32px;
   font-weight: bold;
+  padding: 0px 10px;
+}
+
+ion-toolbar {
+  padding: 0px 10px;
+
+  ion-title {
+    padding: 25px 25px 20px 25px;
+    font-size: 20px;
+    font-weight: bold;
+  }
 }
 
 ion-toolbar .btn-edit::part(native) {

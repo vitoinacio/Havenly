@@ -1,6 +1,11 @@
-ion-title {
-  font-size: 20px;
-  font-weight: bold;
+ion-toolbar {
+  padding: 0px 10px;
+
+  ion-title {
+    padding: 25px 25px 20px 25px;
+    font-size: 20px;
+    font-weight: bold;
+  }
 }
 
 .container {

@@ -1,0 +1,1 @@
+export type ToastColor = 'primary' | 'success' | 'warning' | 'danger' | 'medium';

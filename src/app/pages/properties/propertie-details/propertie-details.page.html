@@ -16,7 +16,8 @@
 </ion-header>
 
 <ion-content id="containerPage" [fullscreen]="true">
-  <div class="container" *ngIf="property">
+  @if (property) {
+  <div class="container">
     <div class="info-card">
       <p><span>Inquilino:</span> {{ property.tenant || 'Nenhum' }}</p>
       <p>
@@ -61,10 +62,11 @@
       </div>
     </div>
   </div>
+  }
 
   <!-- MODAL Pagamento -->
+  @if (isPaymentOpen) {
   <ion-modal
-    *ngIf="isPaymentOpen"
     [isOpen]="true"
     (didDismiss)="isPaymentOpen=false"
     class="property-modal"
@@ -106,6 +108,7 @@
       </div>
     </ng-template>
   </ion-modal>
+  }
 
   <!-- MODAL Editar imóvel -->
   <ion-modal
