@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+      <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
     <ion-title>Minha Conta</ion-title>
   </ion-toolbar>
@@ -9,13 +9,15 @@
 
 <ion-content [fullscreen]="true">
   <div class="container">
-    <form>
+    @if (ready){
+    <form (ngSubmit)="save()">
       <div class="form-group">
         <label>Nome Completo</label>
         <ion-input
           type="text"
           placeholder="Digite seu nome"
           name="name"
+          [(ngModel)]="name"
           required
         ></ion-input>
       </div>
@@ -26,6 +28,7 @@
           type="email"
           placeholder="Digite seu e-mail"
           name="email"
+          [(ngModel)]="email"
           required
         ></ion-input>
       </div>
@@ -36,16 +39,25 @@
           type="tel"
           placeholder="Digite seu telefone"
           name="phone"
+          [(ngModel)]="phone"
         ></ion-input>
       </div>
 
-      <ion-button expand="block" type="submit" class="btn-save">
-        Salvar
+      <ion-button
+        expand="block"
+        type="submit"
+        class="btn-save"
+        [disabled]="loading"
+      >
+        {{ loading ? 'Salvando...' : 'Salvar' }}
       </ion-button>
 
       <div class="divider"></div>
 
-      <div class="delete-account" >Excluir Conta</div>
+      <div class="delete-account" (click)="deleteAccount()">Excluir Conta</div>
     </form>
+    } @if (!ready){
+    <div style="padding: 16px; opacity: 0.7">Carregando seus dados...</div>
+    }
   </div>
 </ion-content>

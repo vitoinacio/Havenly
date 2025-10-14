@@ -1,4 +1,4 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" id="containerPageHeader">
   <div class="search-bar">
     <ion-searchbar
       [debounce]="500"
@@ -30,8 +30,8 @@
         id="{{ property.id }}"
         (click)="selectionMode ? toggleSelectByIndex($index) : goToDetails(property)"
       >
+        @if (selectionMode) {
         <button
-          *ngIf="selectionMode"
           class="select-dot"
           type="button"
           (click)="$event.stopPropagation(); toggleSelectByIndex($index)"
@@ -42,6 +42,7 @@
             [name]="isSelectedIndex($index) ? 'checkmark' : 'ellipse-outline'"
           ></ion-icon>
         </button>
+        }
 
         <div class="properties-img">
           <ion-icon name="home-outline"></ion-icon>
@@ -111,10 +112,9 @@
       [disabled]="selectedIdx.size === 0"
       (click)="deleteSelected()"
     >
-      Excluir
-      <ng-container *ngIf="selectedIdx.size > 0"
-        >&nbsp;({{ selectedIdx.size }})</ng-container
-      >
+      Excluir @if (selectedIdx.size > 0){
+      <ng-container>&nbsp;({{ selectedIdx.size }})</ng-container>
+      }
     </ion-button>
   </div>
 

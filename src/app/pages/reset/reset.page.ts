@@ -8,9 +8,10 @@ import {
   IonLabel,
   IonInput,
   IonButton,
+  IonSpinner,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth/auth.service';
-import { IonicModule } from '@ionic/angular';
+import { ToastService } from 'src/app/services/toast/toast';
 
 @Component({
   selector: 'app-reset',
@@ -18,6 +19,7 @@ import { IonicModule } from '@ionic/angular';
   styleUrls: ['./reset.page.scss'],
   standalone: true,
   imports: [
+    IonSpinner,
     CommonModule,
     FormsModule,
     RouterModule,
@@ -26,27 +28,50 @@ import { IonicModule } from '@ionic/angular';
     IonLabel,
     IonInput,
     IonButton,
-    IonicModule,
   ],
 })
 export class ResetPage {
-  email: string = '';
+  email = '';
+  loading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toast: ToastService
+  ) {}
+
+  private mapResetError(code?: string): string {
+    switch (code) {
+      case 'auth/invalid-email':
+        return 'E-mail inválido.';
+      case 'auth/user-not-found':
+        return 'Não encontramos uma conta com esse e-mail.';
+      case 'auth/network-request-failed':
+        return 'Falha de rede. Verifique sua conexão.';
+      case 'auth/too-many-requests':
+        return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+      default:
+        return 'Não foi possível enviar o e-mail de recuperação.';
+    }
+  }
 
   async onReset() {
-    if (!this.email) {
-      alert('Informe seu email!');
+    const email = this.email.trim();
+    if (!email) {
+      this.toast.show('Informe seu e-mail!', 'warning');
       return;
     }
 
+    this.loading = true;
     try {
-      await this.authService.resetPassword(this.email);
-      alert('Email de recuperação enviado!');
+      await this.authService.resetPassword(email);
+      this.toast.show('E-mail de recuperação enviado! Confira sua caixa de entrada.', 'success');
       this.router.navigate(['/login']);
     } catch (err: any) {
       console.error(err);
-      alert('Erro ao enviar email: ' + err.message);
+      this.toast.show(this.mapResetError(err?.code), 'danger');
+    } finally {
+      this.loading = false;
     }
   }
 

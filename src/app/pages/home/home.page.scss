@@ -1,6 +1,6 @@
 #containerPage {
   .container {
-    padding: 0 25px 24px 25px;
+    padding: 15px 25px 24px 25px;
 
     .header {
       display: flex;
@@ -151,6 +151,7 @@
         padding: 5px 10px;
         border-radius: 10px;
         gap: 2px;
+        font-size: 0.8rem;
       }
       .total-revenue {
         border: 1px solid var(--ion-color-success);

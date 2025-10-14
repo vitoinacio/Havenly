@@ -1,6 +1,18 @@
-import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData } from '@angular/fire/firestore';
-import { Observable, map } from 'rxjs';
+import {
+  Injectable,
+  inject,
+  Injector,
+  runInInjectionContext,
+} from '@angular/core';
+import { Auth, authState } from '@angular/fire/auth';
+import {
+  Firestore,
+  collection,
+  collectionData,
+  query,
+  where,
+} from '@angular/fire/firestore';
+import { Observable, of, switchMap, defer, map } from 'rxjs';
 import { Property } from 'src/app/models/property.model';
 
 type PayStatus = 'Pendente' | 'Pago' | 'Atrasado';
@@ -17,14 +29,33 @@ interface DashboardStats {
 
 @Injectable({ providedIn: 'root' })
 export class Dashboard {
-  private propertyCollection = collection(this.firestore, 'properties');
+  private afs = inject(Firestore);
+  private auth = inject(Auth);
+  private injector = inject(Injector);
 
-  constructor(private firestore: Firestore) {}
+  private readonly propertiesCol = runInInjectionContext(this.injector, () =>
+    collection(this.afs, 'properties')
+  );
+
+  private auth$ = defer(() =>
+    runInInjectionContext(this.injector, () => authState(this.auth))
+  );
 
   getProperties(): Observable<Property[]> {
-    return collectionData(this.propertyCollection, {
-      idField: 'id',
-    }) as Observable<Property[]>;
+    return this.auth$.pipe(
+      switchMap((user) => {
+        if (!user) return of([] as Property[]);
+
+        const q = query(this.propertiesCol, where('ownerId', '==', user.uid));
+
+        return defer(() =>
+          runInInjectionContext(
+            this.injector,
+            () => collectionData(q, { idField: 'id' }) as Observable<Property[]>
+          )
+        );
+      })
+    );
   }
 
   getDashboard$(): Observable<DashboardStats> {
@@ -49,16 +80,17 @@ export class Dashboard {
             rentedCount++;
             totalRevenue += rent;
             revenueExpectedThisMonth += rent;
+
+            const statusMes = (p as any)?.payments?.[year]?.[month] as
+              | PayStatus
+              | undefined;
+
+            if (statusMes === 'Pago') {
+              paidThisMonthCount++;
+              revenuePaidThisMonth += rent;
+            }
           } else if (p.status === 'Vazio') {
             vacantCount++;
-          }
-
-          const statusMes = (p as any)?.payments?.[year]?.[month] as
-            | PayStatus
-            | undefined;
-          if (statusMes === 'Pago') {
-            paidThisMonthCount++;
-            revenuePaidThisMonth += rent;
           }
         }
 

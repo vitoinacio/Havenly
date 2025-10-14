@@ -52,7 +52,7 @@ export interface TabItem {
         display: flex;
         justify-content: space-around;
         align-items: center;
-        height: 56px;
+        height: 65px;
       }
       .tablink {
         display: flex;
