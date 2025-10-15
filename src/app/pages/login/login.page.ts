@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -13,6 +13,7 @@ import {
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-login',
@@ -32,7 +33,7 @@ import { ToastService } from 'src/app/services/toast/toast';
     IonIcon,
   ],
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   email = '';
   password = '';
   loading = false;
@@ -42,6 +43,22 @@ export class LoginPage {
     private router: Router,
     private toast: ToastService
   ) {}
+
+  ngOnInit() {
+    this.handleRedirectIfAny();
+  }
+
+  private async handleRedirectIfAny() {
+    try {
+      const res = await this.authService.handleRedirectResult();
+      if (res?.user) {
+        this.toast.success('Login concluído!');
+        this.router.navigate(['/home'], { replaceUrl: true });
+      }
+    } catch (err: any) {
+      this.toast.error(this.mapPopupError(err?.code));
+    }
+  }
 
   private mapAuthError(code?: string): string {
     switch (code) {
@@ -72,8 +89,7 @@ export class LoginPage {
     this.loading = true;
     try {
       await this.authService.login(email, password);
-      this.toast.success('Bem-vindo!');
-      this.router.navigate(['/home']);
+      this.router.navigate(['/home'], { replaceUrl: true });
     } catch (err: any) {
       switch (err?.code) {
         case 'app/user-not-found':
@@ -102,40 +118,8 @@ export class LoginPage {
           this.toast.warning('E-mail inválido.');
           break;
 
-        default: {
-          if (err?.code === 'auth/invalid-credential') {
-            try {
-              const methods = await this.authService.getSignInMethods(email);
-
-              if (!methods || methods.length === 0) {
-                this.toast.show('Conta não encontrada.', 'warning', 3000, [
-                  {
-                    text: 'Criar conta',
-                    handler: () =>
-                      this.router.navigate(['/register'], {
-                        queryParams: { email },
-                      }),
-                  },
-                  { text: 'Fechar', role: 'cancel' },
-                ]);
-              } else if (methods.includes('google.com')) {
-                this.toast.warning(
-                  'Esta conta foi criada com Google. Use o botão do Google.'
-                );
-              } else if (methods.includes('facebook.com')) {
-                this.toast.warning(
-                  'Esta conta foi criada com Facebook. Use o botão do Facebook.'
-                );
-              } else {
-                this.toast.error('Senha incorreta.');
-              }
-            } catch {
-              this.toast.error(this.mapAuthError(err?.code));
-            }
-          } else {
-            this.toast.error(this.mapAuthError(err?.code));
-          }
-        }
+        default:
+          this.toast.error(this.mapAuthError(err?.code));
       }
     } finally {
       this.loading = false;
@@ -162,18 +146,27 @@ export class LoginPage {
         return 'Outra janela de login já está aberta.';
       case 'auth/popup-blocked':
         return 'Popup bloqueado pelo navegador.';
+      case 'auth/unauthorized-domain':
+      case 'auth/operation-not-allowed':
+      case 'auth/account-exists-with-different-credential':
+        return 'Não foi possível autenticar com o provedor. Verifique a configuração.';
       default:
         return 'Não foi possível autenticar com o provedor. Tente novamente.';
     }
   }
 
-  async loginGoogle() {
+  async loginGoogle(): Promise<void> {
     if (this.loading) return;
     this.loading = true;
     try {
       await this.authService.loginWithGoogle();
-      this.toast.success('Entrou com Google!');
-      this.router.navigate(['/home']);
+
+      if (Capacitor.isNativePlatform()) {
+        this.toast.success('Entrou com Google!');
+        this.router.navigate(['/home'], { replaceUrl: true });
+      } else {
+        this.toast.warning('Redirecionando para o Google…');
+      }
     } catch (err: any) {
       this.toast.error(this.mapPopupError(err?.code));
     } finally {
@@ -181,13 +174,18 @@ export class LoginPage {
     }
   }
 
-  async loginFacebook() {
+  async loginFacebook(): Promise<void> {
     if (this.loading) return;
     this.loading = true;
     try {
       await this.authService.loginWithFacebook();
-      this.toast.success('Entrou com Facebook!');
-      this.router.navigate(['/home']);
+
+      if (Capacitor.isNativePlatform()) {
+        this.toast.success('Entrou com Facebook!');
+        this.router.navigate(['/home'], { replaceUrl: true });
+      } else {
+        this.toast.warning('Redirecionando para o Facebook…');
+      }
     } catch (err: any) {
       this.toast.error(this.mapPopupError(err?.code));
     } finally {

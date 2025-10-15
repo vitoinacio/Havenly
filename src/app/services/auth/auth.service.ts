@@ -4,30 +4,45 @@ import {
   inject,
   runInInjectionContext,
 } from '@angular/core';
+
 import {
   Auth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   FacebookAuthProvider,
+  signInWithCredential,
   User,
   updateProfile,
   authState,
+  fetchSignInMethodsForEmail,
 } from '@angular/fire/auth';
-import { Observable } from 'rxjs';
+
+import { Observable, firstValueFrom } from 'rxjs';
 import { UserService } from '../user/user';
-import { fetchSignInMethodsForEmail } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
+
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private injector = inject(EnvironmentInjector);
 
-  constructor(private auth: Auth, private userSvc: UserService) {}
+  constructor(private auth: Auth, private userSvc: UserService) {
+    try {
+      (this.auth as any).useDeviceLanguage?.();
+    } catch {}
+  }
 
   user$: Observable<User | null> = authState(this.auth);
+
+  userOnce() {
+    return firstValueFrom(this.user$);
+  }
 
   async register(email: string, password: string, displayName?: string) {
     const e = email.trim();
@@ -47,18 +62,7 @@ export class AuthService {
     const e = email.trim();
     const p = password;
 
-    let methods: string[] = [];
-    try {
-      methods = await this.getSignInMethods(e);
-    } catch (err: any) {
-      if (err?.code === 'auth/invalid-email') {
-        const ex: any = new Error('E-mail inválido.');
-        ex.code = 'auth/invalid-email';
-        throw ex;
-      }
-      throw err;
-    }
-
+    const methods = await this.safeGetSignInMethods(e);
     if (!methods || methods.length === 0) {
       const ex: any = new Error(
         'Não existe conta para este e-mail. Crie uma conta para continuar.'
@@ -67,14 +71,10 @@ export class AuthService {
       throw ex;
     }
 
-    const hasPassword = methods.includes('password');
-    const hasGoogle = methods.includes('google.com');
-    const hasFacebook = methods.includes('facebook.com');
-
-    if (!hasPassword) {
+    if (!methods.includes('password')) {
       const provs = [
-        hasGoogle ? 'Google' : null,
-        hasFacebook ? 'Facebook' : null,
+        methods.includes('google.com') ? 'Google' : null,
+        methods.includes('facebook.com') ? 'Facebook' : null,
       ]
         .filter(Boolean)
         .join(' ou ');
@@ -111,25 +111,76 @@ export class AuthService {
   }
 
   async loginWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    const cred = await signInWithPopup(this.auth, provider);
-    await this.userSvc.ensureUserDoc(cred.user);
-    return cred;
+    const isNative = Capacitor.isNativePlatform();
+
+    if (isNative) {
+      const { credential } = await FirebaseAuthentication.signInWithGoogle();
+      const idToken = credential?.idToken;
+      if (!idToken) {
+        const ex: any = new Error('Não foi possível obter o token do Google.');
+        ex.code = 'auth/no-google-idtoken';
+        throw ex;
+      }
+      const gCred = GoogleAuthProvider.credential(idToken);
+      const res = await signInWithCredential(this.auth, gCred);
+      await this.userSvc.ensureUserDoc(res.user);
+      return res;
+    } else {
+      const provider = new GoogleAuthProvider();
+      await signInWithRedirect(this.auth, provider);
+      return null;
+    }
   }
 
   async loginWithFacebook() {
-    const provider = new FacebookAuthProvider();
-    const cred = await signInWithPopup(this.auth, provider);
-    await this.userSvc.ensureUserDoc(cred.user);
-    return cred;
+    const isNative = Capacitor.isNativePlatform();
+
+    if (isNative) {
+      const { credential } = await FirebaseAuthentication.signInWithFacebook({
+        scopes: ['public_profile', 'email'],
+      });
+
+      const accessToken = credential?.accessToken;
+      if (!accessToken) {
+        const ex: any = new Error('Login do Facebook cancelado ou sem token.');
+        ex.code = 'auth/no-facebook-token';
+        throw ex;
+      }
+
+      const fbCred = FacebookAuthProvider.credential(accessToken);
+      const res = await signInWithCredential(this.auth, fbCred);
+      await this.userSvc.ensureUserDoc(res.user);
+      return res;
+    } else {
+      const provider = new FacebookAuthProvider();
+      provider.setCustomParameters?.({ display: 'popup' });
+      await signInWithRedirect(this.auth, provider);
+      return null;
+    }
+  }
+
+  async handleRedirectResult() {
+    try {
+      const res = await getRedirectResult(this.auth);
+      if (res?.user) {
+        await this.userSvc.ensureUserDoc(res.user);
+      }
+      return res;
+    } catch (err) {
+      throw err;
+    }
   }
 
   async getSignInMethods(email: string): Promise<string[]> {
+    return runInInjectionContext(this.injector, () =>
+      fetchSignInMethodsForEmail(this.auth, email.trim())
+    );
+  }
+
+  private async safeGetSignInMethods(email: string): Promise<string[]> {
     try {
-      return await runInInjectionContext(this.injector, () =>
-        fetchSignInMethodsForEmail(this.auth, email.trim())
-      );
-    } catch (err) {
+      return await this.getSignInMethods(email);
+    } catch {
       return [];
     }
   }

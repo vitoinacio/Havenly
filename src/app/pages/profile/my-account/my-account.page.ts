@@ -23,13 +23,7 @@ import {
 
 import { Router } from '@angular/router';
 
-import {
-  Auth,
-  authState,
-  updateProfile,
-  updateEmail,
-  User,
-} from '@angular/fire/auth';
+import { Auth, authState, updateProfile, User } from '@angular/fire/auth';
 
 import {
   Firestore,
@@ -39,10 +33,17 @@ import {
   serverTimestamp,
 } from '@angular/fire/firestore';
 
-import { reload } from 'firebase/auth';
 import { Subject, takeUntil } from 'rxjs';
 import { AccountCleanupService } from 'src/app/services/account/account-cleanup';
 import { ToastService } from 'src/app/services/toast/toast';
+
+import {
+  reload,
+  verifyBeforeUpdateEmail,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from 'firebase/auth';
+import { deleteField } from 'firebase/firestore';
 
 @Component({
   selector: 'app-my-account',
@@ -72,7 +73,6 @@ export class MyAccountPage implements OnInit, OnDestroy {
 
   private user: User | null = null;
   private destroy$ = new Subject<void>();
-
   private injector = inject(EnvironmentInjector);
 
   constructor(
@@ -100,9 +100,7 @@ export class MyAccountPage implements OnInit, OnDestroy {
 
         try {
           const ref = doc(this.afs, 'users', u.uid);
-          const snap = await runInInjectionContext(this.injector, () =>
-            getDoc(ref)
-          );
+          const snap = await getDoc(ref);
           if (snap.exists()) {
             const data = snap.data() as any;
             this.name = (data.name ?? this.name ?? '').trim();
@@ -125,14 +123,53 @@ export class MyAccountPage implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  private async handleReauthThen<T>(fn: () => Promise<T>): Promise<T> {
+    if (!this.user) throw new Error('Usuário não autenticado.');
+    const hasPassword = this.user.providerData.some(
+      (p) => p.providerId === 'password'
+    );
+
+    if (hasPassword) {
+      const alert = await this.alertCtrl.create({
+        header: 'Confirme sua identidade',
+        inputs: [
+          { name: 'password', type: 'password', placeholder: 'Sua senha' },
+        ],
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          { text: 'Confirmar', role: 'confirm' },
+        ],
+      });
+      await alert.present();
+      const res = await alert.onDidDismiss();
+      if (res.role !== 'confirm') throw new Error('Operação cancelada.');
+
+      const pwd = (res.data?.values?.password || '').toString();
+      if (!this.user.email || !pwd) throw new Error('Senha obrigatória.');
+      const cred = EmailAuthProvider.credential(this.user.email, pwd);
+      await reauthenticateWithCredential(this.user, cred);
+      return fn();
+    }
+
+    this.toast.show(
+      'Reautentique-se pelo provedor usado no login (Google/Facebook).',
+      'warning'
+    );
+    throw Object.assign(new Error('requires-recent-login'), {
+      code: 'auth/requires-recent-login',
+    });
+  }
+
   async save() {
     if (!this.user) return;
 
-    const newName = (this.name || '').trim();
-    const newEmail = (this.email || '').trim();
+    const newName = (this.name || '').trim().slice(0, 120);
+    const inputEmail = (this.email || '').trim();
+    const newEmailNorm = inputEmail.toLowerCase();
+    const prevEmailNorm = (this.user.email || '').trim().toLowerCase();
     const newPhone = (this.phone || '').trim();
 
-    if (!newName || !newEmail) {
+    if (!newName || !newEmailNorm) {
       this.toast.show('Nome e e-mail são obrigatórios.', 'warning');
       return;
     }
@@ -140,67 +177,99 @@ export class MyAccountPage implements OnInit, OnDestroy {
     this.loading = true;
     try {
       if (newName !== (this.user.displayName || '')) {
-        await runInInjectionContext(this.injector, () =>
-          updateProfile(this.user!, { displayName: newName })
-        );
+        try {
+          await updateProfile(this.user!, { displayName: newName });
+        } catch (e: any) {
+          if (e?.code === 'auth/requires-recent-login') {
+            await this.handleReauthThen(() =>
+              updateProfile(this.user!, { displayName: newName })
+            );
+          } else {
+            throw e;
+          }
+        }
       }
 
-      if (newEmail !== (this.user.email || '')) {
-        await runInInjectionContext(this.injector, () =>
-          updateEmail(this.user!, newEmail)
-        );
+      if (newEmailNorm !== prevEmailNorm) {
+        try {
+          await verifyBeforeUpdateEmail(this.user!, newEmailNorm);
+          this.toast.show(
+            'Enviamos um link para confirmar a troca de e-mail.',
+            'success'
+          );
+        } catch (e: any) {
+          if (e?.code === 'auth/requires-recent-login') {
+            await this.handleReauthThen(() =>
+              verifyBeforeUpdateEmail(this.user!, newEmailNorm)
+            );
+            this.toast.show(
+              'Enviamos um link para confirmar a troca de e-mail.',
+              'success'
+            );
+          } else if (e?.code === 'auth/invalid-email') {
+            this.toast.show('E-mail inválido.', 'warning');
+            throw e;
+          } else if (e?.code === 'auth/email-already-in-use') {
+            this.toast.show('Este e-mail já está em uso.', 'warning');
+            throw e;
+          } else {
+            throw e;
+          }
+        }
       }
 
       const userRef = doc(this.afs, 'users', this.user.uid);
-      await runInInjectionContext(this.injector, () =>
-        setDoc(
-          userRef,
-          {
-            name: newName,
-            email: newEmail,
-            phone: newPhone,
-            updatedAt: serverTimestamp(),
-          },
-          { merge: true }
-        )
-      );
+      const base = {
+        name: newName,
+        updatedAt: serverTimestamp(),
+      } as any;
 
-      await runInInjectionContext(this.injector, () => reload(this.user!));
+      if (newPhone) {
+        base.phone = newPhone;
+      } else {
+        base.phone = deleteField();
+      }
 
+      if (newEmailNorm === prevEmailNorm) {
+        base.email = newEmailNorm;
+      } else {
+        base.email = prevEmailNorm;
+        base.pendingEmail = newEmailNorm;
+      }
+      await setDoc(userRef, base, { merge: true });
+
+      await reload(this.user!);
       try {
-        const snap = await runInInjectionContext(this.injector, () =>
-          getDoc(userRef)
-        );
+        const snap = await getDoc(userRef);
         if (snap.exists()) {
           const data = snap.data() as any;
           this.name = (data.name ?? newName ?? '').trim();
-          this.email = (data.email ?? newEmail ?? '').trim();
+          this.email = (
+            data.pendingEmail ??
+            data.email ??
+            newEmailNorm ??
+            ''
+          ).trim();
           this.phone = (data.phone ?? newPhone ?? '').trim();
         } else {
           this.name = newName;
-          this.email = newEmail;
+          this.email = newEmailNorm;
           this.phone = newPhone;
         }
       } catch {
         this.name = newName;
-        this.email = newEmail;
+        this.email = newEmailNorm;
         this.phone = newPhone;
       }
 
-      this.toast.show('Dados salvos!', 'success');
-    } catch (e: any) {
-      if (e?.code === 'auth/requires-recent-login') {
-        this.toast.show(
-          'Por segurança, faça login novamente para alterar o e-mail.',
-          'warning'
-        );
-        await this.auth.signOut();
-        this.router.navigateByUrl('/login', { replaceUrl: true });
-      } else {
-        this.toast.show(e?.message || 'Erro ao salvar.', 'danger');
+      if (newEmailNorm === prevEmailNorm) {
+        this.toast.show('Dados salvos!', 'success');
       }
+    } catch (e: any) {
+      this.toast.show(e?.message || 'Erro ao salvar.', 'danger');
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
