@@ -6,6 +6,7 @@ import { Auth, authState } from '@angular/fire/auth';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { Capacitor } from '@capacitor/core';
 import { AuthService } from './services/auth/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,6 @@ export class AppComponent {
   private destroyRef = inject(DestroyRef);
 
   loading = true;
-  private hasNavigatedOnce = false;
 
   constructor() {
     this.boot();
@@ -28,10 +28,16 @@ export class AppComponent {
 
   private async boot() {
     try {
-      if (!Capacitor.isNativePlatform()) {
+      const isNative = Capacitor.getPlatform() !== 'web';
+      if (!isNative) {
         await this.authSvc.handleRedirectResult().catch(() => {});
       }
-    } finally {
+
+      const first = await firstValueFrom(
+        authState(this.auth).pipe(map(Boolean))
+      );
+      await this.ensureRoute(first);
+
       authState(this.auth)
         .pipe(
           map(Boolean),
@@ -39,29 +45,26 @@ export class AppComponent {
           takeUntilDestroyed(this.destroyRef)
         )
         .subscribe((isLoggedIn) => {
-          this.loading = false;
-
-          const publicKeeps = ['/login', '/register', '/reset'];
-          const onPublicKeep = publicKeeps.some((p) =>
-            this.router.url.startsWith(p)
-          );
-
-          const target = isLoggedIn ? '/home' : '/login';
-
-          if (!this.hasNavigatedOnce) {
-            this.hasNavigatedOnce = true;
-            if (isLoggedIn && onPublicKeep) {
-              this.router.navigateByUrl('/home', { replaceUrl: true });
-            } else if (!this.router.url.startsWith(target)) {
-              this.router.navigateByUrl(target, { replaceUrl: true });
-            }
-            return;
-          }
-
-          if (!this.router.url.startsWith(target)) {
-            this.router.navigateByUrl(target, { replaceUrl: true });
-          }
+          this.ensureRoute(isLoggedIn);
         });
+    } finally {
+      this.loading = false;
     }
+  }
+
+  private async ensureRoute(isLoggedIn: boolean) {
+    const publicKeeps = ['/login', '/register', '/reset'];
+    const url = this.router.url || '/';
+    const onPublicKeep = publicKeeps.some((p) => url.startsWith(p));
+    const target = isLoggedIn ? '/home' : '/login';
+
+    if (url.startsWith(target)) return;
+
+    if (isLoggedIn && onPublicKeep) {
+      await this.router.navigateByUrl('/home', { replaceUrl: true });
+      return;
+    }
+
+    await this.router.navigateByUrl(target, { replaceUrl: true });
   }
 }

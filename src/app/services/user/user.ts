@@ -32,7 +32,7 @@ export class UserService {
   }
 
   async ensureUserDoc(u: User | null | undefined) {
-    if (!u) return; // nada a fazer
+    if (!u) return;
 
     const ref = doc(this.afs, 'users', u.uid);
     const snap = await getDoc(ref);
