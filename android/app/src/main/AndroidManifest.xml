@@ -80,7 +80,7 @@
       <!-- Provider do Facebook (requer authorities com o APP_ID) -->
       <provider
       android:name="com.facebook.FacebookContentProvider"
-      android:authorities="com.facebook.app.FacebookContentProviderSEU_FACEBOOK_APP_ID"
+      android:authorities="com.facebook.app.FacebookContentProvider706122391835478"
       android:exported="true"
     />
 
