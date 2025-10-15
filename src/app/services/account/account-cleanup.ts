@@ -4,6 +4,12 @@ import {
   EnvironmentInjector,
   runInInjectionContext,
 } from '@angular/core';
+
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+
+import { Auth, User, deleteUser } from '@angular/fire/auth';
+
 import {
   Firestore,
   collection,
@@ -17,15 +23,7 @@ import {
   CollectionReference,
   DocumentReference,
 } from '@angular/fire/firestore';
-import { Auth, User } from '@angular/fire/auth';
-import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  reauthenticateWithPopup,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  deleteUser,
-} from 'firebase/auth';
+
 import {
   Storage,
   ref as storageRef,
@@ -33,6 +31,15 @@ import {
   deleteObject,
   StorageReference,
 } from '@angular/fire/storage';
+
+import {
+  AuthProvider,
+  EmailAuthProvider,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
+} from 'firebase/auth';
 
 @Injectable({ providedIn: 'root' })
 export class AccountCleanupService {
@@ -48,6 +55,7 @@ export class AccountCleanupService {
     askPassword?: () => Promise<string | null>
   ) {
     const providers = user.providerData.map((p) => p.providerId);
+    const isNative = Capacitor.isNativePlatform();
 
     if (providers.includes('password')) {
       if (!user.email || !askPassword) {
@@ -63,11 +71,37 @@ export class AccountCleanupService {
     }
 
     if (providers.includes('google.com')) {
-      await reauthenticateWithPopup(user, new GoogleAuthProvider());
+      if (isNative) {
+        const { credential } = await FirebaseAuthentication.signInWithGoogle();
+        const idToken = credential?.idToken;
+        if (!idToken)
+          throw new Error('Não foi possível obter token do Google.');
+        const cred = GoogleAuthProvider.credential(idToken);
+        await reauthenticateWithCredential(user, cred);
+      } else {
+        await reauthenticateWithPopup(
+          user,
+          new GoogleAuthProvider() as AuthProvider
+        );
+      }
       return;
     }
+
     if (providers.includes('facebook.com')) {
-      await reauthenticateWithPopup(user, new FacebookAuthProvider());
+      if (isNative) {
+        const { credential } =
+          await FirebaseAuthentication.signInWithFacebook();
+        const accessToken = credential?.accessToken;
+        if (!accessToken)
+          throw new Error('Não foi possível obter token do Facebook.');
+        const cred = FacebookAuthProvider.credential(accessToken);
+        await reauthenticateWithCredential(user, cred);
+      } else {
+        await reauthenticateWithPopup(
+          user,
+          new FacebookAuthProvider() as AuthProvider
+        );
+      }
       return;
     }
 

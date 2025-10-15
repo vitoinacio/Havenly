@@ -13,6 +13,7 @@ import {
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-register',
@@ -100,13 +101,18 @@ export class RegisterPage {
     this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 
-  async loginGoogle() {
+  async loginGoogle(): Promise<void> {
     if (this.loading) return;
     this.loading = true;
     try {
       await this.authService.loginWithGoogle();
-      this.toast.show('Conta criada/entrada com Google!', 'success');
-      this.router.navigateByUrl('/home', { replaceUrl: true });
+
+      if (Capacitor.isNativePlatform()) {
+        this.toast.show('Conta criada/entrada com Google!', 'success');
+        this.router.navigateByUrl('/home', { replaceUrl: true });
+      } else {
+        this.toast.show('Redirecionando para o Google…', 'warning');
+      }
     } catch (err: any) {
       console.error(err);
       const code = err?.code as string | undefined;
@@ -115,6 +121,8 @@ export class RegisterPage {
           ? 'Janela do Google foi fechada antes de concluir.'
           : code === 'auth/popup-blocked'
           ? 'Popup do Google foi bloqueado pelo navegador.'
+          : code === 'auth/account-exists-with-different-credential'
+          ? 'Este e-mail já está vinculado a outro provedor. Faça login com ele.'
           : 'Não foi possível usar o Google. Tente novamente.';
       this.toast.show(msg, 'danger');
     } finally {
@@ -122,13 +130,18 @@ export class RegisterPage {
     }
   }
 
-  async loginFacebook() {
+  async loginFacebook(): Promise<void> {
     if (this.loading) return;
     this.loading = true;
     try {
       await this.authService.loginWithFacebook();
-      this.toast.show('Conta criada/entrada com Facebook!', 'success');
-      this.router.navigateByUrl('/home', { replaceUrl: true });
+
+      if (Capacitor.isNativePlatform()) {
+        this.toast.show('Conta criada/entrada com Facebook!', 'success');
+        this.router.navigateByUrl('/home', { replaceUrl: true });
+      } else {
+        this.toast.show('Redirecionando para o Facebook…', 'warning');
+      }
     } catch (err: any) {
       console.error(err);
       const code = err?.code as string | undefined;
@@ -137,6 +150,8 @@ export class RegisterPage {
           ? 'Janela do Facebook foi fechada antes de concluir.'
           : code === 'auth/popup-blocked'
           ? 'Popup do Facebook foi bloqueado pelo navegador.'
+          : code === 'auth/account-exists-with-different-credential'
+          ? 'Este e-mail já está vinculado a outro provedor. Faça login com ele.'
           : 'Não foi possível usar o Facebook. Tente novamente.';
       this.toast.show(msg, 'danger');
     } finally {

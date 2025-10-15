@@ -40,12 +40,14 @@ export class ResetPage {
     private toast: ToastService
   ) {}
 
+  private isEmail(v: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  }
+
   private mapResetError(code?: string): string {
     switch (code) {
       case 'auth/invalid-email':
         return 'E-mail inválido.';
-      case 'auth/user-not-found':
-        return 'Não encontramos uma conta com esse e-mail.';
       case 'auth/network-request-failed':
         return 'Falha de rede. Verifique sua conexão.';
       case 'auth/too-many-requests':
@@ -55,24 +57,29 @@ export class ResetPage {
     }
   }
 
-  async onReset() {
-    const email = this.email.trim();
-    if (!email) {
-      this.toast.show('Informe seu e-mail!', 'warning');
+  async onReset(): Promise<void> {
+    if (this.loading) return;
+
+    const email = this.email.toLowerCase().trim();
+    if (!email || !this.isEmail(email)) {
+      this.toast.show('Informe um e-mail válido!', 'warning');
       return;
     }
 
     this.loading = true;
     try {
       await this.authService.resetPassword(email);
-      this.toast.show('E-mail de recuperação enviado! Confira sua caixa de entrada.', 'success');
-      this.router.navigate(['/login']);
     } catch (err: any) {
-      console.error(err);
-      this.toast.show(this.mapResetError(err?.code), 'danger');
     } finally {
       this.loading = false;
     }
+
+    this.toast.show(
+      'Se existir uma conta para esse e-mail, enviamos instruções de recuperação.',
+      'success',
+      5000
+    );
+    this.router.navigate(['/login']);
   }
 
   goToLogin() {
