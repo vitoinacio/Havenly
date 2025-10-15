@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
-    <!-- App -->
     <string name="app_name">Havenly</string>
     <string name="title_activity_main">Havenly</string>
 
-    <!-- Deve bater com defaultConfig.applicationId em android/app/build.gradle -->
     <string name="package_name">com.havenly.app</string>
-
-    <!-- Esquema de URL usado por Capacitor (OK manter igual ao package) -->
     <string name="custom_url_scheme">com.havenly.app</string>
 
     <!-- FACEBOOK -->
-    <!-- ID numérico do app no Facebook Developers -->
-    <string name="facebook_app_id">SEU_FACEBOOK_APP_ID</string>
-    <!-- Scheme fb + APP_ID, usado pelo SDK p/ voltar ao app -->
-    <string name="fb_login_protocol_scheme">fbSEU_FACEBOOK_APP_ID</string>
+    <string name="facebook_app_id">706122391835478</string>
+    <string name="fb_login_protocol_scheme">fb706122391835478</string>
 </resources>
