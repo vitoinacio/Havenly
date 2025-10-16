@@ -85,6 +85,14 @@ export class MyAccountPage implements OnInit, OnDestroy {
     private toast: ToastService
   ) {}
 
+  private normalizePhone(v: string) {
+    return (v || '').replace(/[^\d+()\-\s]/g, '').trim();
+  }
+  private isPhoneBR(v: string) {
+    const s = this.normalizePhone(v);
+    return s.length >= 8 && s.length <= 16 && /^[0-9+()\-\s]{8,16}$/.test(s);
+  }
+
   ngOnInit() {
     runInInjectionContext(this.injector, () => authState(this.auth))
       .pipe(takeUntil(this.destroy$))
@@ -105,7 +113,7 @@ export class MyAccountPage implements OnInit, OnDestroy {
             const data = snap.data() as any;
             this.name = (data.name ?? this.name ?? '').trim();
             this.email = (data.email ?? this.email ?? '').trim();
-            this.phone = (data.phone ?? '').trim();
+            this.phone = (data.phone ?? '').toString().trim();
           } else {
             this.phone = '';
           }
@@ -167,10 +175,19 @@ export class MyAccountPage implements OnInit, OnDestroy {
     const inputEmail = (this.email || '').trim();
     const newEmailNorm = inputEmail.toLowerCase();
     const prevEmailNorm = (this.user.email || '').trim().toLowerCase();
-    const newPhone = (this.phone || '').trim();
+    const newPhoneRaw = (this.phone || '').trim();
+    const newPhone = this.normalizePhone(newPhoneRaw);
 
     if (!newName || !newEmailNorm) {
       this.toast.show('Nome e e-mail são obrigatórios.', 'warning');
+      return;
+    }
+
+    if (newPhone && !this.isPhoneBR(newPhone)) {
+      this.toast.show(
+        'Telefone inválido. Use apenas números, +, (, ), -, espaço (8–16 caracteres).',
+        'warning'
+      );
       return;
     }
 
@@ -219,10 +236,10 @@ export class MyAccountPage implements OnInit, OnDestroy {
       }
 
       const userRef = doc(this.afs, 'users', this.user.uid);
-      const base = {
+      const base: any = {
         name: newName,
         updatedAt: serverTimestamp(),
-      } as any;
+      };
 
       if (newPhone) {
         base.phone = newPhone;
@@ -236,6 +253,7 @@ export class MyAccountPage implements OnInit, OnDestroy {
         base.email = prevEmailNorm;
         base.pendingEmail = newEmailNorm;
       }
+
       await setDoc(userRef, base, { merge: true });
 
       await reload(this.user!);
@@ -250,7 +268,7 @@ export class MyAccountPage implements OnInit, OnDestroy {
             newEmailNorm ??
             ''
           ).trim();
-          this.phone = (data.phone ?? newPhone ?? '').trim();
+          this.phone = (data.phone ?? newPhone ?? '').toString().trim();
         } else {
           this.name = newName;
           this.email = newEmailNorm;

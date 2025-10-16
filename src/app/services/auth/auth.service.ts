@@ -23,7 +23,6 @@ import {
 import { Observable, firstValueFrom } from 'rxjs';
 import { UserService } from '../user/user';
 import { Capacitor } from '@capacitor/core';
-
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 @Injectable({ providedIn: 'root' })
@@ -118,25 +117,47 @@ export class AuthService {
       }
       const gCred = GoogleAuthProvider.credential(idToken);
       const res = await signInWithCredential(this.auth, gCred);
-      await this.userSvc.ensureUserDoc(res.user);
+
+      try {
+        await this.userSvc.ensureUserDoc(res.user);
+      } catch (fireErr) {
+        console.error(
+          'Falha ao criar/atualizar userDoc no Firestore:',
+          fireErr
+        );
+        throw fireErr;
+      }
       return res;
     } else {
       const provider = new GoogleAuthProvider();
       try {
         const res = await signInWithPopup(this.auth, provider);
         if (res?.user) {
-          await this.userSvc.ensureUserDoc(res.user);
+          try {
+            await this.userSvc.ensureUserDoc(res.user);
+          } catch (fireErr) {
+            console.error(
+              'Falha ao criar/atualizar userDoc no Firestore:',
+              fireErr
+            );
+            throw fireErr;
+          }
         }
         return res;
-      } catch (error) {
-        console.error('Erro no login com popup:', error);
-        return null;
+      } catch (popupErr: any) {
+        if (
+          typeof popupErr?.code === 'string' &&
+          popupErr.code.startsWith('auth/')
+        ) {
+          console.error('Falha no signInWithPopup:', popupErr);
+        } else {
+          console.error('Falha pós-login (Firestore):', popupErr);
+        }
+        throw popupErr;
       }
     }
   }
 
-  // A função handleRedirectResult não é mais necessária para o fluxo com popup.
-  // Pode ser removida ou deixada em branco.
   async handleRedirectResult() {
     return null;
   }

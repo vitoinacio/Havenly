@@ -12,7 +12,6 @@ import {
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast';
-import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-register',

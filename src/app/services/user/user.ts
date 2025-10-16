@@ -8,17 +8,6 @@ import {
 } from '@angular/fire/firestore';
 import type { User } from '@angular/fire/auth';
 
-type ProviderId = 'password' | 'google.com' | 'facebook.com' | string;
-
-export interface UserDoc {
-  name?: string;
-  email?: string;
-  photoURL?: string | null;
-  providers?: ProviderId[];
-  createdAt?: any;
-  updatedAt?: any;
-}
-
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(private afs: Firestore) {}
@@ -29,6 +18,17 @@ export class UserService {
 
   private clampName(v: string) {
     return v.trim().replace(/\s+/g, ' ').slice(0, 120);
+  }
+
+  private pruneNullish<T extends Record<string, any>>(obj: T): Partial<T> {
+    const out: Partial<T> = {};
+    for (const k of Object.keys(obj) as (keyof T)[]) {
+      const val = obj[k];
+      if (val !== null && val !== undefined) {
+        out[k] = val;
+      }
+    }
+    return out;
   }
 
   async ensureUserDoc(u: User | null | undefined) {
@@ -43,41 +43,25 @@ export class UserService {
         ? displayName
         : displayName || (u.email ? u.email.split('@')[0] : '');
 
-    const next: Partial<UserDoc> = {
+    const base = this.pruneNullish({
+      name: firstLast ? this.clampName(firstLast) : undefined,
+      email: this.isEmail(u.email) ? (u.email as string) : undefined,
+      photoURL:
+        typeof u.photoURL === 'string' && u.photoURL.trim()
+          ? u.photoURL.trim()
+          : undefined,
       updatedAt: serverTimestamp(),
-    };
-
-    if (firstLast) next.name = this.clampName(firstLast);
-    if (this.isEmail(u.email)) next.email = u.email!;
-    if (u.photoURL) next.photoURL = u.photoURL;
-    if (u.providerData?.length) {
-      next.providers = u.providerData
-        .map((p) => p?.providerId)
-        .filter(Boolean) as ProviderId[];
-    }
+    });
 
     if (!snap.exists()) {
-      await setDoc(ref, { ...next, createdAt: serverTimestamp() } as UserDoc);
+      const createPayload = this.pruneNullish({
+        ...base,
+        createdAt: serverTimestamp(),
+      });
+      await setDoc(ref, createPayload);
       return;
     }
-    const current = (snap.data() || {}) as UserDoc;
-    const payload: Partial<UserDoc> = { updatedAt: serverTimestamp() };
 
-    const name = next.name ?? current.name;
-    if (name && name !== current.name) payload.name = name;
-
-    const email = next.email ?? current.email;
-    if (email && email !== current.email) payload.email = email;
-
-    const photoURL = (next.photoURL ?? current.photoURL) || null;
-    if (photoURL !== (current.photoURL ?? null)) payload.photoURL = photoURL;
-
-    const providers = next.providers ?? current.providers ?? [];
-    const providersChanged =
-      providers.length !== (current.providers?.length ?? 0) ||
-      providers.some((p, i) => p !== current.providers?.[i]);
-    if (providersChanged) payload.providers = providers;
-
-    await setDoc(ref, payload, { merge: true });
+    await setDoc(ref, base, { merge: true });
   }
 }
