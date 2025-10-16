@@ -7,10 +7,9 @@
     android:label="@string/app_name"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
-    android:theme="@style/AppTheme" 
+    android:theme="@style/AppTheme"
   >
 
-      <!-- Activity principal do Capacitor -->
       <activity
       android:name=".MainActivity"
       android:label="@string/title_activity_main"
@@ -25,7 +24,6 @@
               <category android:name="android.intent.category.LAUNCHER" />
           </intent-filter>
 
-          <!-- Deep links do Capacitor (mantém) -->
           <intent-filter>
               <action android:name="android.intent.action.VIEW" />
               <category android:name="android.intent.category.DEFAULT" />
@@ -34,7 +32,6 @@
           </intent-filter>
       </activity>
 
-      <!-- FileProvider padrão do Capacitor -->
       <provider
       android:name="androidx.core.content.FileProvider"
       android:authorities="${applicationId}.fileprovider"
@@ -47,45 +44,7 @@
       />
       </provider>
 
-      <!-- ===== FACEBOOK SDK (obrigatório p/ login nativo) ===== -->
-
-      <!-- App ID do Facebook -->
-      <meta-data
-      android:name="com.facebook.sdk.ApplicationId"
-      android:value="@string/facebook_app_id"
-    />
-
-      <!-- Activity do Facebook -->
-      <activity
-      android:name="com.facebook.FacebookActivity"
-      android:exported="true"
-      android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-      android:label="@string/app_name"
-    />
-
-      <!-- CustomTabActivity para web fallback -->
-      <activity
-      android:name="com.facebook.CustomTabActivity"
-      android:exported="true"
-    >
-          <intent-filter>
-              <action android:name="android.intent.action.VIEW" />
-              <category android:name="android.intent.category.DEFAULT" />
-              <category android:name="android.intent.category.BROWSABLE" />
-              <!-- Precisa bater com fb + APP_ID -->
-              <data android:scheme="@string/fb_login_protocol_scheme" />
-          </intent-filter>
-      </activity>
-
-      <!-- Provider do Facebook (requer authorities com o APP_ID) -->
-      <provider
-      android:name="com.facebook.FacebookContentProvider"
-      android:authorities="com.facebook.app.FacebookContentProvider706122391835478"
-      android:exported="true"
-    />
-
   </application>
 
-  <!-- Permissões -->
   <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

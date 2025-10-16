@@ -11,10 +11,8 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   GoogleAuthProvider,
-  FacebookAuthProvider,
   signInWithCredential,
   User,
   updateProfile,
@@ -72,10 +70,7 @@ export class AuthService {
     }
 
     if (!methods.includes('password')) {
-      const provs = [
-        methods.includes('google.com') ? 'Google' : null,
-        methods.includes('facebook.com') ? 'Facebook' : null,
-      ]
+      const provs = [methods.includes('google.com') ? 'Google' : null]
         .filter(Boolean)
         .join(' ou ');
       const ex: any = new Error(
@@ -127,48 +122,23 @@ export class AuthService {
       return res;
     } else {
       const provider = new GoogleAuthProvider();
-      await signInWithRedirect(this.auth, provider);
-      return null;
-    }
-  }
-
-  async loginWithFacebook() {
-    const isNative = Capacitor.isNativePlatform();
-
-    if (isNative) {
-      const { credential } = await FirebaseAuthentication.signInWithFacebook({
-        scopes: ['public_profile', 'email'],
-      });
-
-      const accessToken = credential?.accessToken;
-      if (!accessToken) {
-        const ex: any = new Error('Login do Facebook cancelado ou sem token.');
-        ex.code = 'auth/no-facebook-token';
-        throw ex;
+      try {
+        const res = await signInWithPopup(this.auth, provider);
+        if (res?.user) {
+          await this.userSvc.ensureUserDoc(res.user);
+        }
+        return res;
+      } catch (error) {
+        console.error('Erro no login com popup:', error);
+        return null;
       }
-
-      const fbCred = FacebookAuthProvider.credential(accessToken);
-      const res = await signInWithCredential(this.auth, fbCred);
-      await this.userSvc.ensureUserDoc(res.user);
-      return res;
-    } else {
-      const provider = new FacebookAuthProvider();
-      provider.setCustomParameters?.({ display: 'popup' });
-      await signInWithRedirect(this.auth, provider);
-      return null;
     }
   }
 
+  // A função handleRedirectResult não é mais necessária para o fluxo com popup.
+  // Pode ser removida ou deixada em branco.
   async handleRedirectResult() {
-    try {
-      const res = await getRedirectResult(this.auth);
-      if (res?.user) {
-        await this.userSvc.ensureUserDoc(res.user);
-      }
-      return res;
-    } catch (err) {
-      throw err;
-    }
+    return null;
   }
 
   async getSignInMethods(email: string): Promise<string[]> {

@@ -5,8 +5,4 @@
 
     <string name="package_name">com.havenly.app</string>
     <string name="custom_url_scheme">com.havenly.app</string>
-
-    <!-- FACEBOOK -->
-    <string name="facebook_app_id">706122391835478</string>
-    <string name="fb_login_protocol_scheme">fb706122391835478</string>
 </resources>

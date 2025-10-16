@@ -9,7 +9,6 @@ import {
   IonInput,
   IonButton,
   IonSpinner,
-  IonIcon,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth/auth.service';
 import { ToastService } from 'src/app/services/toast/toast';
@@ -30,7 +29,6 @@ import { Capacitor } from '@capacitor/core';
     IonInput,
     IonButton,
     IonSpinner,
-    IonIcon,
   ],
 })
 export class RegisterPage {
@@ -101,59 +99,30 @@ export class RegisterPage {
     this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 
+  private mapPopupError(code?: string): string {
+    switch (code) {
+      case 'auth/popup-closed-by-user':
+        return 'Janela fechada antes de concluir.';
+      case 'auth/cancelled-popup-request':
+        return 'Outra janela de login já está aberta.';
+      case 'auth/popup-blocked':
+        return 'Popup bloqueado pelo navegador.';
+      default:
+        return 'Não foi possível autenticar com o Google. Tente novamente.';
+    }
+  }
+
   async loginGoogle(): Promise<void> {
     if (this.loading) return;
     this.loading = true;
     try {
-      await this.authService.loginWithGoogle();
+      const result = await this.authService.loginWithGoogle();
 
-      if (Capacitor.isNativePlatform()) {
-        this.toast.show('Conta criada/entrada com Google!', 'success');
-        this.router.navigateByUrl('/home', { replaceUrl: true });
-      } else {
-        this.toast.show('Redirecionando para o Google…', 'warning');
+      if (result?.user) {
+        this.toast.success('Login com Google concluído!');
       }
     } catch (err: any) {
-      console.error(err);
-      const code = err?.code as string | undefined;
-      const msg =
-        code === 'auth/popup-closed-by-user'
-          ? 'Janela do Google foi fechada antes de concluir.'
-          : code === 'auth/popup-blocked'
-          ? 'Popup do Google foi bloqueado pelo navegador.'
-          : code === 'auth/account-exists-with-different-credential'
-          ? 'Este e-mail já está vinculado a outro provedor. Faça login com ele.'
-          : 'Não foi possível usar o Google. Tente novamente.';
-      this.toast.show(msg, 'danger');
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  async loginFacebook(): Promise<void> {
-    if (this.loading) return;
-    this.loading = true;
-    try {
-      await this.authService.loginWithFacebook();
-
-      if (Capacitor.isNativePlatform()) {
-        this.toast.show('Conta criada/entrada com Facebook!', 'success');
-        this.router.navigateByUrl('/home', { replaceUrl: true });
-      } else {
-        this.toast.show('Redirecionando para o Facebook…', 'warning');
-      }
-    } catch (err: any) {
-      console.error(err);
-      const code = err?.code as string | undefined;
-      const msg =
-        code === 'auth/popup-closed-by-user'
-          ? 'Janela do Facebook foi fechada antes de concluir.'
-          : code === 'auth/popup-blocked'
-          ? 'Popup do Facebook foi bloqueado pelo navegador.'
-          : code === 'auth/account-exists-with-different-credential'
-          ? 'Este e-mail já está vinculado a outro provedor. Faça login com ele.'
-          : 'Não foi possível usar o Facebook. Tente novamente.';
-      this.toast.show(msg, 'danger');
+      this.toast.error(this.mapPopupError(err?.code));
     } finally {
       this.loading = false;
     }

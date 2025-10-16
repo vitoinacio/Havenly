@@ -4,8 +4,6 @@ import { IonApp, IonRouterOutlet, IonSpinner } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { Auth, authState } from '@angular/fire/auth';
 import { map, distinctUntilChanged } from 'rxjs/operators';
-import { Capacitor } from '@capacitor/core';
-import { AuthService } from './services/auth/auth.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -17,7 +15,6 @@ import { firstValueFrom } from 'rxjs';
 export class AppComponent {
   private auth = inject(Auth);
   private router = inject(Router);
-  private authSvc = inject(AuthService);
   private destroyRef = inject(DestroyRef);
 
   loading = true;
@@ -28,15 +25,10 @@ export class AppComponent {
 
   private async boot() {
     try {
-      const isNative = Capacitor.getPlatform() !== 'web';
-      if (!isNative) {
-        await this.authSvc.handleRedirectResult().catch(() => {});
-      }
-
-      const first = await firstValueFrom(
+      const firstIsLoggedIn = await firstValueFrom(
         authState(this.auth).pipe(map(Boolean))
       );
-      await this.ensureRoute(first);
+      await this.ensureRoute(firstIsLoggedIn);
 
       authState(this.auth)
         .pipe(
@@ -58,13 +50,17 @@ export class AppComponent {
     const onPublicKeep = publicKeeps.some((p) => url.startsWith(p));
     const target = isLoggedIn ? '/home' : '/login';
 
-    if (url.startsWith(target)) return;
+    if (url.startsWith(target)) {
+      return;
+    }
 
     if (isLoggedIn && onPublicKeep) {
       await this.router.navigateByUrl('/home', { replaceUrl: true });
       return;
     }
 
-    await this.router.navigateByUrl(target, { replaceUrl: true });
+    if (!isLoggedIn && !onPublicKeep) {
+      await this.router.navigateByUrl('/login', { replaceUrl: true });
+    }
   }
 }
