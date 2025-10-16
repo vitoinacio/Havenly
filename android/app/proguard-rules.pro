@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Manter todas as classes do SDK do Facebook
+-keep class com.facebook.** { *; }
+-keepattributes Signature
