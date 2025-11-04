@@ -61,14 +61,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'notifications',
-    canActivate: [AuthGuard],
-    loadComponent: () =>
-      import('./pages/profile/notifications/notifications.page').then(
-        (m) => m.NotificationsPage
-      ),
-  },
-  {
     path: 'security',
     canActivate: [AuthGuard],
     loadComponent: () =>

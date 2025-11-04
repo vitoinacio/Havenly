@@ -54,7 +54,7 @@ export class RegisterPage {
       case 'auth/network-request-failed':
         return 'Falha de rede. Verifique sua conexão.';
       case 'auth/account-exists-with-different-credential':
-        return 'Este e-mail já está vinculado a um provedor social. Use o botão do provedor.';
+        return 'Este e-mail já está vinculado a um provedor social.';
       default:
         return 'Não foi possível registrar. Tente novamente.';
     }
@@ -96,34 +96,5 @@ export class RegisterPage {
 
   goToLogin() {
     this.router.navigateByUrl('/login', { replaceUrl: true });
-  }
-
-  private mapPopupError(code?: string): string {
-    switch (code) {
-      case 'auth/popup-closed-by-user':
-        return 'Janela fechada antes de concluir.';
-      case 'auth/cancelled-popup-request':
-        return 'Outra janela de login já está aberta.';
-      case 'auth/popup-blocked':
-        return 'Popup bloqueado pelo navegador.';
-      default:
-        return 'Não foi possível autenticar com o Google. Tente novamente.';
-    }
-  }
-
-  async loginGoogle(): Promise<void> {
-    if (this.loading) return;
-    this.loading = true;
-    try {
-      const result = await this.authService.loginWithGoogle();
-
-      if (result?.user) {
-        this.toast.success('Login com Google concluído!');
-      }
-    } catch (err: any) {
-      this.toast.error(this.mapPopupError(err?.code));
-    } finally {
-      this.loading = false;
-    }
   }
 }

@@ -16,12 +16,12 @@ ion-toolbar .btn-edit {
 
 ion-toolbar {
   padding: 0px 10px;
+}
 
-  ion-title {
-    padding: 25px 25px 20px 25px;
-    font-size: 20px;
-    font-weight: bold;
-  }
+ion-toolbar ion-title {
+  padding: 25px 25px 20px 25px;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 ion-toolbar .btn-edit::part(native) {
@@ -37,28 +37,28 @@ ion-toolbar .btn-edit::part(native) {
   border-radius: 12px;
   padding: 12px 14px;
   margin-bottom: 16px;
+}
 
-  p {
-    margin: 6px 0;
-    color: var(--ion-color-light-contrast);
+.info-card p {
+  margin: 6px 0;
+  color: var(--ion-color-light-contrast);
+}
 
-    span:first-child {
-      color: var(--ion-color-medium);
-      font-weight: 700;
-      margin-right: 6px;
-    }
+.info-card p span:first-child {
+  color: var(--ion-color-medium);
+  font-weight: 700;
+  margin-right: 6px;
+}
 
-    .price {
-      color: var(--ion-color-primary);
-      font-weight: 800;
-    }
+.info-card p .price {
+  color: var(--ion-color-primary);
+  font-weight: 800;
+}
 
-    ion-badge {
-      vertical-align: middle;
-      font-weight: 700;
-      color: white;
-    }
-  }
+.info-card p ion-badge {
+  vertical-align: middle;
+  font-weight: 700;
+  color: white;
 }
 
 .section-title {
@@ -71,40 +71,45 @@ ion-toolbar .btn-edit::part(native) {
   display: flex;
   flex-direction: column;
   gap: 8px;
-
-  .month-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(
-      135deg,
-      var(--ion-color-light-tint) 0%,
-      var(--ion-color-light-shade) 100%
-    );
-    border-radius: 10px;
-    padding: 10px 12px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-    cursor: pointer;
-    user-select: none;
-
-    .label {
-      font-weight: 700;
-      color: var(--ion-color-light-contrast);
-    }
-
-    ion-badge {
-      font-weight: 800;
-      --border-radius: 10px;
-      color: #e4e2e2;
-    }
-  }
 }
 
+.months-list .month-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(
+    135deg,
+    var(--ion-color-light-tint) 0%,
+    var(--ion-color-light-shade) 100%
+  );
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  user-select: none;
+}
+
+.months-list .month-row .label {
+  font-weight: 700;
+  color: var(--ion-color-light-contrast);
+}
+
+.months-list .month-row ion-badge {
+  font-weight: 800;
+  --border-radius: 10px;
+  color: #e4e2e2;
+}
+
+/* ========= MODAL ========= */
 ion-modal.property-modal {
+  /* mantém o seu visual */
   --width: min(520px, 92vw);
-  --max-height: 86vh;
   --border-radius: 16px;
   --box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+
+  /* garante que a altura respeite a viewport e permita scroll interno */
+  --height: auto;
+  --max-height: 86vh;
 }
 
 /* Só quando estiver aberto */
@@ -112,11 +117,17 @@ ion-modal.property-modal.modal-present::part(backdrop) {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
 }
+
 ion-modal.property-modal.modal-present::part(content) {
+  /* Não altera o design, apenas assegura que o conteúdo possa conter overflow interno */
   background: transparent;
   padding: 0;
+  display: block;
+  max-height: 86vh;
+  overflow: hidden; /* o container interno fará o scroll */
 }
 
+/* Container interno do modal com rolagem vertical */
 .modal-container {
   background: var(--ion-color-light);
   border-radius: 16px;
@@ -125,61 +136,92 @@ ion-modal.property-modal.modal-present::part(content) {
   display: flex;
   flex-direction: column;
   gap: 14px;
+
+  /* chave do scroll */
+  max-height: calc(86vh - 32px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* suaviza no iOS */
 }
+
+/* Cabeçalho do modal */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
-
-  h2 {
-    font-size: 18px;
-    font-weight: 800;
-  }
-  ion-icon {
-    font-size: 22px;
-    cursor: pointer;
-    color: var(--ion-color-medium);
-  }
-  ion-icon:hover {
-    color: var(--ion-color-light);
-  }
-
-  .icon-btn {
-    background: transparent;
-    border: 0;
-    padding: 0;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-  }
 }
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.modal-header ion-icon {
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--ion-color-medium);
+}
+
+.modal-header ion-icon:hover {
+  color: var(--ion-color-light);
+}
+
+.modal-header .icon-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+/* Form dentro do modal */
 .form-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  ion-input,
-  ion-select {
-    --color: #fff;
-    --padding-start: 10px;
-    border-radius: 8px;
-    border: 1px solid var(--ion-color-medium);
-  }
 }
+
+.form-container ion-input,
+.form-container ion-select {
+  --color: #fff;
+  --padding-start: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--ion-color-medium);
+}
+
 .buttons {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 16px;
-  ion-button {
-    font-weight: 700;
-    min-width: 100px;
+}
+
+.buttons ion-button {
+  font-weight: 700;
+  min-width: 100px;
+}
+
+.buttons ion-button[color="medium"] {
+  --background: var(--ion-color-medium);
+  --color: #fff;
+}
+
+.buttons ion-button[color="primary"] {
+  --background: var(--ion-color-primary);
+}
+
+@media (max-width: 480px) {
+  ion-modal.property-modal {
+    --width: calc(100vw - 24px);
+    --max-height: 88vh; 
   }
-  ion-button[color="medium"] {
-    --background: var(--ion-color-medium);
-    --color: #fff;
+
+  ion-modal.property-modal.modal-present::part(content) {
+    max-height: 88vh;
   }
-  ion-button[color="primary"] {
-    --background: var(--ion-color-primary);
+
+  .modal-container {
+    max-height: calc(88vh - 28px);
   }
 }

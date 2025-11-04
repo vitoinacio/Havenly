@@ -8,7 +8,7 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonButtons,
   templateUrl: './help-support.page.html',
   styleUrls: ['./help-support.page.scss'],
   standalone: true,
-  imports: [IonButton, IonLabel, IonItem, IonAccordion, IonAccordionGroup, IonButtons, IonBackButton, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [ IonButton, IonLabel, IonItem, IonAccordion, IonAccordionGroup, IonButtons, IonBackButton, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
 })
 export class HelpSupportPage implements OnInit {
 

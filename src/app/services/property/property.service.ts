@@ -86,6 +86,18 @@ export class PropertyService {
     const status = property.status === 'Alugado' ? 'Alugado' : 'Vazio';
     const photo = property.photo ? String(property.photo).trim() : undefined;
 
+    const addr = property.address || {};
+    const address = {
+      cep: (addr.cep || '').replace(/\D/g, '').slice(0, 8) || undefined,
+      city: (addr.city || '').toString().trim() || undefined,
+      neighborhood: (addr.neighborhood || '').toString().trim() || undefined,
+      number: (addr.number || '').toString().trim() || undefined,
+    };
+
+    Object.keys(address).forEach(
+      (k) => (address as any)[k] === undefined && delete (address as any)[k]
+    );
+
     return addDoc(this.col, {
       ownerId: user.uid,
       name,
@@ -94,6 +106,7 @@ export class PropertyService {
       dueDate,
       status,
       ...(photo ? { photo } : {}),
+      ...(Object.keys(address).length ? { address } : {}),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -115,6 +128,7 @@ export class PropertyService {
       'status',
       'photo',
       'payments',
+      'address',
     ]);
 
     const clean: Record<string, any> = {};
@@ -129,6 +143,19 @@ export class PropertyService {
         clean[k] = isFinite(n) && n >= 0 ? n : 0;
       } else if (k === 'status') {
         clean[k] = v === 'Alugado' ? 'Alugado' : 'Vazio';
+      } else if (k === 'address') {
+        const addr = v as Property['address'];
+        const out = {
+          cep: (addr?.cep || '').replace(/\D/g, '').slice(0, 8) || undefined,
+          city: (addr?.city || '').toString().trim() || undefined,
+          neighborhood:
+            (addr?.neighborhood || '').toString().trim() || undefined,
+          number: (addr?.number || '').toString().trim() || undefined,
+        };
+        Object.keys(out).forEach(
+          (kk) => (out as any)[kk] === undefined && delete (out as any)[kk]
+        );
+        if (Object.keys(out).length) clean[k] = out;
       } else {
         clean[k] = v;
       }

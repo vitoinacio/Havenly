@@ -70,6 +70,7 @@ export class LoginPage {
     this.loading = true;
     try {
       await this.authService.login(email, password);
+      this.router.navigateByUrl('/home', { replaceUrl: true });
     } catch (err: any) {
       switch (err?.code) {
         case 'app/user-not-found':
@@ -81,12 +82,6 @@ export class LoginPage {
             },
             { text: 'Fechar', role: 'cancel' },
           ]);
-          break;
-        case 'app/use-oauth-provider':
-          this.toast.warning(
-            err?.message ||
-              'Use o provedor social configurado para esse e-mail.'
-          );
           break;
         case 'app/wrong-password':
           this.toast.error('Senha incorreta.');
@@ -112,35 +107,5 @@ export class LoginPage {
     this.router.navigate(['/reset'], {
       queryParams: { email: this.email.trim() },
     });
-  }
-
-  private mapPopupError(code?: string): string {
-    switch (code) {
-      case 'auth/popup-closed-by-user':
-        return 'Janela fechada antes de concluir.';
-      case 'auth/cancelled-popup-request':
-        return 'Outra janela de login já está aberta.';
-      case 'auth/popup-blocked':
-        return 'Popup bloqueado pelo navegador.';
-      default:
-        return 'Não foi possível autenticar com o Google. Tente novamente.';
-    }
-  }
-
-  async loginGoogle(): Promise<void> {
-    if (this.loading) return;
-    this.loading = true;
-    try {
-
-      const result = await this.authService.loginWithGoogle();
-
-      if (result?.user) {
-        this.toast.success('Login com Google concluído!');
-      }
-    } catch (err: any) {
-      this.toast.error(this.mapPopupError(err?.code));
-    } finally {
-      this.loading = false;
-    }
   }
 }

@@ -20,7 +20,11 @@ import {
 } from '@ionic/angular/standalone';
 
 import { BottomTabsComponent } from 'src/app/components/tabss/bottom-tabs.component';
-import { Property, NewProperty } from 'src/app/models/property.model';
+import {
+  Property,
+  NewProperty,
+  AddressVM,
+} from 'src/app/models/property.model';
 import { PropertyService } from 'src/app/services/property/property.service';
 
 @Component({
@@ -56,6 +60,27 @@ export class PropertiesPage implements OnInit, OnDestroy {
   activeFilter: 'all' | 'rented' | 'vacant' = 'all';
   searchQuery = '';
 
+  // Modal / Form
+  isModalOpen = false;
+
+  // Estado da busca de CEP (opcional para exibir mensagens/spinners)
+  cepLookupLoading = false;
+  cepLookupError = '';
+
+  // Controle para evitar chamadas repetidas e debouncing
+  private lastCepQueried: string | null = null;
+  private cepDebounceHandle: any = null;
+
+  // Garante que address SEMPRE exista (evita undefined no template)
+  newProperty: NewProperty & { address: AddressVM } = {
+    name: '',
+    tenant: '',
+    rent: 0,
+    dueDate: '',
+    status: 'Vazio',
+    address: { cep: '', city: '', neighborhood: '', number: '' },
+  };
+
   constructor(
     private router: Router,
     private propertyService: PropertyService
@@ -74,8 +99,12 @@ export class PropertiesPage implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.cepDebounceHandle) {
+      clearTimeout(this.cepDebounceHandle);
+    }
   }
 
+  // --------- Lista / Filtro ---------
   private normalize(s: string): string {
     return (s ?? '')
       .toString()
@@ -117,47 +146,157 @@ export class PropertiesPage implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  isModalOpen = false;
-
-  newProperty: NewProperty = {
-    name: '',
-    tenant: '',
-    rent: 0,
-    dueDate: '',
-    status: 'Vazio',
-  };
-
+  // --------- Modal ---------
   openModal() {
+    if (!this.newProperty.address) {
+      this.newProperty.address = {
+        cep: '',
+        city: '',
+        neighborhood: '',
+        number: '',
+      };
+    }
     this.isModalOpen = true;
+    this.cepLookupError = '';
+    this.cepLookupLoading = false;
+    this.lastCepQueried = null;
   }
+
   closeModal() {
     this.isModalOpen = false;
   }
 
+  // --------- CEP reativo ---------
+  private normalizeCep(raw: string) {
+    return (raw || '').replace(/\D/g, '').slice(0, 8);
+  }
+
+  /**
+   * Chamado a cada digitação no campo CEP.
+   * Quando completar 8 dígitos, consulta ViaCEP e preenche cidade/bairro.
+   */
+  onCepInput(ev: any) {
+    const raw = ev?.detail?.value ?? '';
+    const cep = this.normalizeCep(raw);
+
+    if (!this.newProperty.address) {
+      this.newProperty.address = {
+        cep: '',
+        city: '',
+        neighborhood: '',
+        number: '',
+      };
+    }
+    this.newProperty.address.cep = cep;
+
+    // limpamos estados e debounce anterior
+    this.cepLookupError = '';
+    if (this.cepDebounceHandle) {
+      clearTimeout(this.cepDebounceHandle);
+      this.cepDebounceHandle = null;
+    }
+
+    if (cep.length < 8) {
+      this.cepLookupLoading = false;
+      return;
+    }
+
+    // debounce curto para evitar rajada de requisições
+    this.cepDebounceHandle = setTimeout(() => {
+      if (cep !== this.lastCepQueried) {
+        this.lookupCep(cep);
+      }
+    }, 300);
+  }
+
+  private async lookupCep(cep: string) {
+    this.cepLookupLoading = true;
+    this.cepLookupError = '';
+    this.lastCepQueried = cep;
+
+    try {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 8000);
+
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`, {
+        signal: ctrl.signal,
+      });
+      clearTimeout(to);
+
+      if (!res.ok) throw new Error('Falha na consulta de CEP');
+
+      const data = await res.json();
+      if (data?.erro) {
+        this.cepLookupError = 'CEP não encontrado.';
+        return;
+      }
+
+      const city = (data?.localidade ?? '').toString().trim();
+      const neighborhood = (data?.bairro ?? '').toString().trim();
+
+      // mantém valores já digitados se API não retornar
+      this.newProperty.address = {
+        cep,
+        city: city || this.newProperty.address.city || '',
+        neighborhood:
+          neighborhood || this.newProperty.address.neighborhood || '',
+        number: this.newProperty.address.number || '',
+      };
+    } catch (err: any) {
+      this.cepLookupError =
+        err?.name === 'AbortError'
+          ? 'Tempo de resposta excedido ao buscar o CEP.'
+          : 'Não foi possível consultar o CEP agora.';
+    } finally {
+      this.cepLookupLoading = false;
+    }
+  }
+
+  // --------- Salvar ---------
   async saveProperty() {
+    const addr = this.newProperty.address || {
+      cep: '',
+      city: '',
+      neighborhood: '',
+      number: '',
+    };
+
     const toSave: NewProperty = {
-      name: this.newProperty.name?.trim() || 'Novo Imóvel',
-      tenant: this.newProperty.tenant?.trim() || 'Disponível',
+      name: (this.newProperty.name || '').trim() || 'Novo Imóvel',
+      tenant: (this.newProperty.tenant || '').trim() || 'Disponível',
       rent: Number(this.newProperty.rent) || 0,
       dueDate: this.newProperty.dueDate || '',
       status: this.newProperty.status,
+      address: {
+        cep: this.normalizeCep(addr.cep || ''),
+        city: (addr.city || '').trim(),
+        neighborhood: (addr.neighborhood || '').trim(),
+        number: (addr.number ?? '').toString().trim(),
+      },
     };
 
     try {
       await this.propertyService.addProperty(toSave);
+      // reset do form (address garantido)
       this.newProperty = {
         name: '',
         tenant: '',
         rent: 0,
         dueDate: '',
         status: 'Vazio',
+        address: { cep: '', city: '', neighborhood: '', number: '' },
       };
+      this.cepLookupError = '';
+      this.cepLookupLoading = false;
+      this.lastCepQueried = null;
+
       this.closeModal();
     } catch (e) {
       console.error('Erro ao adicionar imóvel', e);
     }
   }
 
+  // --------- Seleção / Exclusão ---------
   selectionMode = false;
   selectedIdx = new Set<number>();
 

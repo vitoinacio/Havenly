@@ -15,15 +15,31 @@
 
     <div class="qr-container">
       <div class="qr-box">
-        <p>QR CODE</p>
+        <img *ngIf="qrDataUrl" [src]="qrDataUrl" alt="QR Code TOTP" />
+        <p *ngIf="!qrDataUrl">Gerando QR...</p>
+
+        <ion-button
+          size="small"
+          fill="clear"
+          class="qr-refresh"
+          (click)="regenerate()"
+          [disabled]="loading"
+        >
+          Regerar QR
+        </ion-button>
       </div>
+    </div>
+
+    <div class="secret-hint" *ngIf="secretKey">
+      <p>Se preferir, adicione manualmente esta chave no autenticador:</p>
+      <code>{{ secretKey }}</code>
     </div>
 
     <p class="info-text">
       Após escanear, insira o código de 6 dígitos gerado pelo aplicativo.
     </p>
 
-    <form class="form-2fa">
+    <form class="form-2fa" (ngSubmit)="onSubmit()">
       <ion-input
         type="text"
         maxlength="6"
@@ -31,9 +47,16 @@
         name="twoFactorCode"
         required
         class="code-input"
+        [(ngModel)]="code"
+        [disabled]="loading"
       ></ion-input>
 
-      <ion-button expand="block" type="submit"> Verificar e Ativar </ion-button>
+      <ion-button expand="block" type="submit" [disabled]="loading || !code">
+        Verificar e Ativar
+      </ion-button>
+
+      <div class="error" *ngIf="error">{{ error }}</div>
+      <div class="success" *ngIf="success">{{ success }}</div>
     </form>
   </div>
 </ion-content>

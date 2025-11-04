@@ -24,6 +24,9 @@ import { PropertyService } from 'src/app/services/property/property.service';
 import { PropertyPayStatus } from 'src/app/models/property-pay-status';
 import { ToastService } from 'src/app/services/toast/toast';
 
+// Se seu AddressVM estiver no mesmo arquivo do model de Property, importe-o também:
+import type { AddressVM } from 'src/app/models/property.model';
+
 @Component({
   selector: 'app-property-details',
   standalone: true,
@@ -63,15 +66,27 @@ export class PropertieDetailsPage implements OnDestroy {
   } | null = null;
   paymentForm: { status: PropertyPayStatus } = { status: 'Pendente' };
 
+  // Modal de edição
   isEditOpen = false;
 
-  form: Partial<Omit<Property, 'id' | 'ownerId'>> & { photo?: string } = {
+  // Form de edição — garante address sempre definido para não dar undefined no template
+  form: Partial<Omit<Property, 'id' | 'ownerId'>> & {
+    photo?: string;
+    address: AddressVM;
+  } = {
     name: '',
     tenant: '',
     rent: 0,
     dueDate: '',
     status: 'Vazio',
+    address: { cep: '', city: '', neighborhood: '', number: '' },
   };
+
+  // Estado de CEP no modal de edição (reativo)
+  editCepLoading = false;
+  editCepError = '';
+  private lastCepQueriedEdit: string | null = null;
+  private cepDebounceHandle: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -97,20 +112,11 @@ export class PropertieDetailsPage implements OnDestroy {
     }
   }
 
+  // ---------- Util / Meses ----------
   private recomputeMonths() {
     const nomes = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro',
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
     ];
     const today = new Date();
     const currentMonth = today.getMonth();
@@ -139,8 +145,9 @@ export class PropertieDetailsPage implements OnDestroy {
     const d = new Date(this.property.dueDate);
     const day = d.getDate();
     return Number.isFinite(day) && day > 0 ? day : 1;
-  }
+    }
 
+  // ---------- Pagamento ----------
   openPayment(m: { idx: number; nome: string; status: PropertyPayStatus }) {
     this.editingMonth = { ...m };
     this.paymentForm = { status: m.status };
@@ -172,14 +179,20 @@ export class PropertieDetailsPage implements OnDestroy {
       );
     } catch (e) {
       console.error('Erro ao salvar status do mês', e);
-      this.toast.show('Erro ao salvar pagamento.', 'danger'); // 👈
+      this.toast.show('Erro ao salvar pagamento.', 'danger');
     }
 
     this.closePayment();
   }
 
+  // ---------- Editar ----------
   openEdit() {
     if (!this.property) return;
+
+    const addr = this.property.address ?? {
+      cep: '', city: '', neighborhood: '', number: ''
+    };
+
     this.form = {
       name: this.property.name,
       tenant: this.property.tenant ?? '',
@@ -187,18 +200,104 @@ export class PropertieDetailsPage implements OnDestroy {
       dueDate: this.property.dueDate || '',
       status: this.property.status,
       photo: this.property.photo ?? undefined,
+      address: {
+        cep: addr.cep ?? '',
+        city: addr.city ?? '',
+        neighborhood: addr.neighborhood ?? '',
+        number: addr.number ?? '',
+      },
     };
+
     this.isEditOpen = true;
+    this.editCepError = '';
+    this.editCepLoading = false;
+    this.lastCepQueriedEdit = null;
   }
 
   closeEdit() {
     this.isEditOpen = false;
   }
 
+  private normalizeCep(raw: string) {
+    return (raw || '').replace(/\D/g, '').slice(0, 8);
+  }
+
+  onEditCepInput(ev: any) {
+    const raw = ev?.detail?.value ?? '';
+    const cep = this.normalizeCep(raw);
+
+    if (!this.form.address) {
+      this.form.address = { cep: '', city: '', neighborhood: '', number: '' };
+    }
+    this.form.address.cep = cep;
+
+    this.editCepError = '';
+    if (this.cepDebounceHandle) {
+      clearTimeout(this.cepDebounceHandle);
+      this.cepDebounceHandle = null;
+    }
+
+    if (cep.length < 8) {
+      this.editCepLoading = false;
+      return;
+    }
+
+    this.cepDebounceHandle = setTimeout(() => {
+      if (cep !== this.lastCepQueriedEdit) {
+        this.lookupCepEdit(cep);
+      }
+    }, 300);
+  }
+
+  private async lookupCepEdit(cep: string) {
+    this.editCepLoading = true;
+    this.editCepError = '';
+    this.lastCepQueriedEdit = cep;
+
+    try {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 8000);
+
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`, {
+        signal: ctrl.signal,
+      });
+      clearTimeout(to);
+
+      if (!res.ok) throw new Error('Falha na consulta de CEP');
+
+      const data = await res.json();
+      if (data?.erro) {
+        this.editCepError = 'CEP não encontrado.';
+        return;
+      }
+
+      const city = (data?.localidade ?? '').toString().trim();
+      const neighborhood = (data?.bairro ?? '').toString().trim();
+
+      this.form.address = {
+        cep,
+        city: city || this.form.address.city || '',
+        neighborhood: neighborhood || this.form.address.neighborhood || '',
+        number: this.form.address.number || '',
+      };
+    } catch (err: any) {
+      this.editCepError =
+        err?.name === 'AbortError'
+          ? 'Tempo de resposta excedido ao buscar o CEP.'
+          : 'Não foi possível consultar o CEP agora.';
+    } finally {
+      this.editCepLoading = false;
+    }
+  }
+
   async saveEdit() {
     if (!this.property) return;
 
     const photoClean = this.form.photo ? String(this.form.photo).trim() : '';
+    const addr = this.form.address ?? {
+      cep: '', city: '', neighborhood: '', number: ''
+    };
+
     const patch: Partial<Omit<Property, 'id' | 'ownerId'>> = {
       name: (this.form.name ?? this.property.name)?.toString().trim(),
       tenant: (this.form.tenant ?? '').toString().trim() || 'Disponível',
@@ -206,6 +305,12 @@ export class PropertieDetailsPage implements OnDestroy {
       dueDate: this.form.dueDate ?? this.property.dueDate ?? '',
       status: (this.form.status ?? this.property.status) as Property['status'],
       ...(photoClean ? { photo: photoClean } : {}),
+      address: {
+        cep: this.normalizeCep(addr.cep || ''),
+        city: (addr.city || '').trim(),
+        neighborhood: (addr.neighborhood || '').trim(),
+        number: (addr.number ?? '').toString().trim(),
+      },
     };
 
     try {
@@ -230,5 +335,8 @@ export class PropertieDetailsPage implements OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.cepDebounceHandle) {
+      clearTimeout(this.cepDebounceHandle);
+    }
   }
 }

@@ -7,6 +7,7 @@ ion-toolbar {
     font-weight: bold;
   }
 }
+
 .container {
   padding: 20px 25px calc(10px + env(safe-area-inset-bottom)) 25px;
   display: flex;
@@ -37,6 +38,33 @@ ion-toolbar {
       color: var(--ion-color-light);
       font-weight: bold;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+      position: relative; /* para posicionar o botão por cima */
+      overflow: hidden; /* evita que algo extrapole */
+
+      img {
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 8px;
+      }
+
+      p {
+        margin: 0;
+        font-weight: bold;
+      }
+
+      .qr-refresh {
+        position: absolute;
+        bottom: 0px;
+        --padding-start: 6px;
+        --padding-end: 6px;
+        --padding-top: 2px;
+        --padding-bottom: 2px;
+        z-index: 2;
+        width: 100%;
+        font-weight: bold;
+        color: #fff;
+      }
     }
   }
 
@@ -44,6 +72,21 @@ ion-toolbar {
     font-size: 13px;
     color: var(--ion-color-medium);
     margin-bottom: 20px;
+  }
+
+  .secret-hint {
+    font-size: 12px;
+    margin: -10px 0 12px 0;
+
+    code {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: var(--ion-color-light-shade);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    }
   }
 
   .form-2fa {
@@ -73,6 +116,16 @@ ion-toolbar {
       font-weight: 600;
       color: white;
       width: 100%;
+    }
+
+    .error {
+      color: var(--ion-color-danger);
+      font-size: 12px;
+    }
+
+    .success {
+      color: var(--ion-color-success);
+      font-size: 12px;
     }
   }
 }

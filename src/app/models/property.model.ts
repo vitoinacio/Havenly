@@ -7,6 +7,19 @@ export interface Property {
   dueDate: string;
   photo?: string;
   status: 'Alugado' | 'Vazio';
+  address?: {
+    cep?: string;
+    city?: string;
+    neighborhood?: string;
+    number?: string;
+  };
 }
 
 export type NewProperty = Omit<Property, 'id' | 'ownerId'>;
+
+export type AddressVM = {
+  cep: string;
+  city: string;
+  neighborhood: string;
+  number: string;
+};

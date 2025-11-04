@@ -34,6 +34,17 @@
           {{ property.status }}
         </ion-badge>
       </p>
+
+      <!-- Endereço (somente mostra se houver algo preenchido) -->
+      <div
+        style="margin-top: 8px"
+        *ngIf="property.address && (property.address.cep || property.address.city || property.address.neighborhood || property.address.number)"
+      >
+        <p><span>CEP:</span> {{ property.address.cep || '-' }}</p>
+        <p><span>Cidade:</span> {{ property.address.city || '-' }}</p>
+        <p><span>Bairro:</span> {{ property.address.neighborhood || '-' }}</p>
+        <p><span>Número:</span> {{ property.address.number || '-' }}</p>
+      </div>
     </div>
 
     <h3 class="section-title">Relatório de Pagamentos - {{ currentYear }}</h3>
@@ -168,6 +179,42 @@
             <ion-select-option value="Vazio">Vazio</ion-select-option>
             <ion-select-option value="Alugado">Alugado</ion-select-option>
           </ion-select>
+
+          <ion-input
+            label="CEP"
+            labelPlacement="stacked"
+            inputmode="numeric"
+            maxlength="8"
+            [debounce]="400"
+            [(ngModel)]="form.address.cep"
+            (ionInput)="onEditCepInput($event)"
+            name="editCep"
+            placeholder="Somente números, ex: 01001000"
+          ></ion-input>
+
+          <ion-input
+            label="Cidade"
+            labelPlacement="stacked"
+            [(ngModel)]="form.address.city"
+            name="editCity"
+            placeholder="Cidade"
+          ></ion-input>
+
+          <ion-input
+            label="Bairro"
+            labelPlacement="stacked"
+            [(ngModel)]="form.address.neighborhood"
+            name="editNeighborhood"
+            placeholder="Bairro"
+          ></ion-input>
+
+          <ion-input
+            label="Número"
+            labelPlacement="stacked"
+            [(ngModel)]="form.address.number"
+            name="editNumber"
+            placeholder="Número/Apto"
+          ></ion-input>
 
           <div class="buttons">
             <ion-button color="medium" type="button" (click)="closeEdit()">

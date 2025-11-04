@@ -5,9 +5,6 @@ import {
   runInInjectionContext,
 } from '@angular/core';
 
-import { Capacitor } from '@capacitor/core';
-import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-
 import { Auth, User, deleteUser } from '@angular/fire/auth';
 
 import {
@@ -32,14 +29,7 @@ import {
   StorageReference,
 } from '@angular/fire/storage';
 
-import {
-  AuthProvider,
-  EmailAuthProvider,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  reauthenticateWithCredential,
-  reauthenticateWithPopup,
-} from 'firebase/auth';
+import { EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 
 @Injectable({ providedIn: 'root' })
 export class AccountCleanupService {
@@ -55,12 +45,11 @@ export class AccountCleanupService {
     askPassword?: () => Promise<string | null>
   ) {
     const providers = user.providerData.map((p) => p.providerId);
-    const isNative = Capacitor.isNativePlatform();
 
     if (providers.includes('password')) {
       if (!user.email || !askPassword) {
         throw new Error(
-          'Reautenticação necessária. Forneça a senha do usuário.'
+          'Reautenticação necessária. Informe a senha do usuário.'
         );
       }
       const pwd = await askPassword();
@@ -70,43 +59,8 @@ export class AccountCleanupService {
       return;
     }
 
-    if (providers.includes('google.com')) {
-      if (isNative) {
-        const { credential } = await FirebaseAuthentication.signInWithGoogle();
-        const idToken = credential?.idToken;
-        if (!idToken)
-          throw new Error('Não foi possível obter token do Google.');
-        const cred = GoogleAuthProvider.credential(idToken);
-        await reauthenticateWithCredential(user, cred);
-      } else {
-        await reauthenticateWithPopup(
-          user,
-          new GoogleAuthProvider() as AuthProvider
-        );
-      }
-      return;
-    }
-
-    if (providers.includes('facebook.com')) {
-      if (isNative) {
-        const { credential } =
-          await FirebaseAuthentication.signInWithFacebook();
-        const accessToken = credential?.accessToken;
-        if (!accessToken)
-          throw new Error('Não foi possível obter token do Facebook.');
-        const cred = FacebookAuthProvider.credential(accessToken);
-        await reauthenticateWithCredential(user, cred);
-      } else {
-        await reauthenticateWithPopup(
-          user,
-          new FacebookAuthProvider() as AuthProvider
-        );
-      }
-      return;
-    }
-
     throw new Error(
-      'Reautenticação necessária. Entre novamente e repita a exclusão.'
+      'Reautenticação necessária. Entre novamente com sua conta e repita a exclusão.'
     );
   }
 

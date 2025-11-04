@@ -7,12 +7,12 @@
   }
 }
 
+/* esconder scrollbars do conteúdo principal */
 ion-content,
 ion-content::part(scroll) {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
-
 ion-content::-webkit-scrollbar,
 ion-content::part(scroll)::-webkit-scrollbar {
   display: none !important;
@@ -65,6 +65,7 @@ ion-content::part(scroll)::-webkit-scrollbar {
       );
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
       cursor: pointer;
+      position: relative; /* p/ o botão de seleção */
 
       .properties-img {
         flex: 15%;
@@ -85,29 +86,29 @@ ion-content::part(scroll)::-webkit-scrollbar {
         align-items: flex-start;
         line-height: 1.15;
         row-gap: 2px;
-      }
 
-      .properties-info > p {
-        margin: 0
-      }
+        > p {
+          margin: 0;
+        }
 
-      .properties-info .property-title {
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 2px;
-      }
+        .property-title {
+          font-size: 12px;
+          font-weight: 700;
+          margin-bottom: 2px;
+        }
 
-      .properties-info .property-tenant,
-      .properties-info .property-price,
-      .properties-info .property-due {
-        color: var(--ion-color-medium);
-        font-size: 12px;
-        margin-top: 0;
-      }
+        .property-tenant,
+        .property-price,
+        .property-due {
+          color: var(--ion-color-medium);
+          font-size: 12px;
+          margin-top: 0;
+        }
 
-      .properties-info .property-price {
-        font-weight: 700;
-        color: var(--ion-color-primary);
+        .property-price {
+          font-weight: 700;
+          color: var(--ion-color-primary);
+        }
       }
 
       .properties-status {
@@ -125,19 +126,38 @@ ion-content::part(scroll)::-webkit-scrollbar {
 ion-fab {
   margin-bottom: 80px;
   margin-right: 20px;
+
   ion-fab-button {
     --color: white;
   }
 
-  ion-fab-list {
-    ion-fab-button {
-      ion-icon {
-        color: white;
-      }
-    }
+  ion-fab-list ion-fab-button ion-icon {
+    color: white;
   }
 }
 
+/* ---------- MODAL ---------- */
+
+/* define uma var própria que usaremos p/ calcular o max-height do container */
+ion-modal.property-modal {
+  --width: min(520px, 92vw);
+  --height: auto;
+  --property-modal-max-height: 86vh; /* usamos abaixo no container */
+  --border-radius: 16px;
+  --box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+ion-modal.property-modal::part(backdrop) {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+ion-modal.property-modal::part(content) {
+  background: transparent;
+  padding: 0;
+  display: block; /* mantém layout blocado */
+}
+
+/* ÚNICA definição de .modal-container (sem duplicatas) */
 .modal-container {
   background: var(--ion-color-light);
   border-radius: 16px;
@@ -146,6 +166,16 @@ ion-fab {
   display: flex;
   flex-direction: column;
   gap: 14px;
+
+  /* 👇 garante rolagem interna do conteúdo do modal  */
+  max-height: calc(var(--property-modal-max-height, 86vh) - 32px);
+  overflow-y: auto;
+
+  /* rolagem suave e sem barra visível */
+  scrollbar-width: thin;
+}
+.modal-container::-webkit-scrollbar {
+  width: 0; /* oculta no webkit */
 }
 
 .modal-header {
@@ -163,14 +193,11 @@ ion-fab {
     cursor: pointer;
     color: var(--ion-color-medium);
     transition: 0.2s;
+
     &:hover {
       color: var(--ion-color-light);
     }
   }
-}
-
-.properties-list .properties-item {
-  position: relative;
 }
 
 .select-dot {
@@ -206,82 +233,37 @@ ion-fab {
   display: flex;
   gap: 10px;
   z-index: 30;
-}
 
-.selection-actions .pill {
-  --border-radius: 999px;
-  padding: 0 18px;
-  height: 44px;
-  font-weight: 700;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
-}
+  .pill {
+    --border-radius: 999px;
+    padding: 0 18px;
+    height: 44px;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
 
-.selection-actions .pill.delete {
-  --background: var(--ion-color-danger);
-  --color: #fff;
-}
-
-.selection-actions .pill.cancel {
-  --background: var(--ion-color-medium);
-  --color: #fff;
-}
-
-ion-modal.property-modal {
-  --width: min(520px, 92vw);
-  --max-height: 86vh;
-  --border-radius: 16px;
-  --box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-}
-ion-modal.property-modal::part(backdrop) {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-}
-ion-modal.property-modal::part(content) {
-  background: transparent;
-  padding: 0;
-  display: block;
-}
-
-.modal-container {
-  background: var(--ion-color-light);
-  border-radius: 16px;
-  padding: 22px;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-.modal-header h2 {
-  font-size: 18px;
-  font-weight: 700;
-}
-.modal-header ion-icon {
-  font-size: 22px;
-  cursor: pointer;
-  color: var(--ion-color-medium);
-  transition: 0.2s;
-}
-.modal-header ion-icon:hover {
-  color: var(--ion-color-light);
+    &.delete {
+      --background: var(--ion-color-danger);
+      --color: #fff;
+    }
+    &.cancel {
+      --background: var(--ion-color-medium);
+      --color: #fff;
+    }
+  }
 }
 
 .form-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-.form-container ion-input,
-.form-container ion-select {
-  --color: #fff;
-  --padding-start: 10px;
-  border-radius: 8px;
-  border: 1px solid var(--ion-color-medium);
+
+  ion-input,
+  ion-select {
+    --color: #fff;
+    --padding-start: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--ion-color-medium);
+  }
 }
 
 .buttons {
@@ -289,26 +271,29 @@ ion-modal.property-modal::part(content) {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 16px;
-}
-.buttons ion-button {
-  font-weight: 600;
-  min-width: 100px;
-}
-.buttons ion-button[color="medium"] {
-  --background: var(--ion-color-medium);
-  --color: white;
-}
-.buttons ion-button[color="primary"] {
-  --background: var(--ion-color-primary);
-  --color: white;
+
+  ion-button {
+    font-weight: 600;
+    min-width: 100px;
+  }
+
+  ion-button[color="medium"] {
+    --background: var(--ion-color-medium);
+    --color: white;
+  }
+  ion-button[color="primary"] {
+    --background: var(--ion-color-primary);
+    --color: white;
+  }
 }
 
 @media (max-width: 480px) {
   ion-modal.property-modal {
     --width: calc(100vw - 24px);
-    --max-height: 88vh;
+    --property-modal-max-height: 88vh;
     --border-radius: 14px;
   }
+
   .selection-actions {
     bottom: calc(env(safe-area-inset-bottom) + 86px);
   }

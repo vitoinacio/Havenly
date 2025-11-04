@@ -42,11 +42,6 @@ function toTwoWordsSafe(input: string | null | undefined): string {
 export class ProfilePage {
   itemsConfig: itemsConfigType[] = [
     { href: '/my-account', icon: 'person-circle-outline', text: 'Minha Conta' },
-    {
-      href: '/notifications',
-      icon: 'notifications-outline',
-      text: 'Notificações',
-    },
     { href: '/security', icon: 'lock-closed-outline', text: 'Segurança' },
     {
       href: '/help-support',
