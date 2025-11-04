@@ -59,40 +59,25 @@ export class AuthService {
     const e = email.trim();
     const p = password;
 
-    const methods = await this.safeGetSignInMethods(e);
-    if (!methods || methods.length === 0) {
-      const ex: any = new Error(
-        'Não existe conta para este e-mail. Crie uma conta para continuar.'
-      );
-      ex.code = 'app/user-not-found';
-      throw ex;
-    }
-
-    if (!methods.includes('password')) {
-      const provs = [methods.includes('google.com') ? 'Google' : null]
-        .filter(Boolean)
-        .join(' ou ');
-      const ex: any = new Error(
-        provs
-          ? `Esta conta foi criada com ${provs}. Use o botão do ${provs}.`
-          : 'Esta conta usa um provedor diferente.'
-      );
-      ex.code = 'app/use-oauth-provider';
-      ex.providers = methods;
-      throw ex;
-    }
-
     try {
       const cred = await signInWithEmailAndPassword(this.auth, e, p);
       await this.userSvc.ensureUserDoc(cred.user);
       return cred;
     } catch (err: any) {
-      if (err?.code === 'auth/invalid-credential') {
-        const ex: any = new Error('Senha incorreta.');
-        ex.code = 'app/wrong-password';
-        throw ex;
+      switch (err?.code) {
+        case 'auth/user-not-found':
+          throw Object.assign(new Error('Não existe conta para este e-mail.'), {
+            code: 'app/user-not-found',
+          });
+        case 'auth/invalid-login-credentials':
+        case 'auth/invalid-credential':
+        case 'auth/wrong-password':
+          throw Object.assign(new Error('Senha incorreta.'), {
+            code: 'app/wrong-password',
+          });
+        default:
+          throw err;
       }
-      throw err;
     }
   }
 
@@ -108,14 +93,24 @@ export class AuthService {
     const isNative = Capacitor.isNativePlatform();
 
     if (isNative) {
-      const { credential } = await FirebaseAuthentication.signInWithGoogle();
+      const { credential } = await FirebaseAuthentication.signInWithGoogle({
+        skipNativeAuth: true,
+        scopes: ['profile', 'email'],
+      });
+
       const idToken = credential?.idToken;
-      if (!idToken) {
+      const accessToken = credential?.accessToken;
+
+      if (!idToken && !accessToken) {
         const ex: any = new Error('Não foi possível obter o token do Google.');
         ex.code = 'auth/no-google-idtoken';
         throw ex;
       }
-      const gCred = GoogleAuthProvider.credential(idToken);
+
+      const gCred = GoogleAuthProvider.credential(
+        idToken || null,
+        accessToken || null
+      );
       const res = await signInWithCredential(this.auth, gCred);
 
       try {
