@@ -7,12 +7,6 @@
 <ion-content [fullscreen]="true" id="containerPage">
   <div class="container">
     <section class="header-perfil">
-      <div class="img-container">
-        <img src="../../../assets/user.png" alt="foto de perfil" />
-        <div>
-          <ion-icon name="pencil-outline"></ion-icon>
-        </div>
-      </div>
       <div class="user-info">
         <h2>{{ name$ | async }}</h2>
         <p>{{ email$ | async }}</p>
